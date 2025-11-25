@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:UTSTransit.ViewModels"
+             x:Class="UTSTransit.Views.DriverPage"
+             Title="我是司机">
+
+    <VerticalStackLayout Spacing="20" Padding="30" VerticalOptions="Center">
+
+        <Label Text="🚌 巴士追踪 - 司机端" 
+               FontSize="24" 
+               HorizontalOptions="Center" 
+               FontAttributes="Bold"/>
+
+        <Label Text="选择当前路线:" />
+
+        <Picker SelectedItem="{Binding SelectedRoute}">
+            <Picker.ItemsSource>
+                <x:Array Type="{x:Type x:String}">
+                    <x:String>Route A (Dorm -> Campus)</x:String>
+                    <x:String>Route B (Campus -> Dorm)</x:String>
+                    <x:String>Route C (Weekend Special)</x:String>
+                </x:Array>
+            </Picker.ItemsSource>
+        </Picker>
+
+        <Label Text="{Binding StatusMessage}" 
+               TextColor="Blue"
+               HorizontalOptions="Center" />
+
+        <ActivityIndicator IsRunning="{Binding IsBusy}" 
+                           Color="Orange" />
+
+        <Button Text="{Binding IsBusy, Converter={StaticResource BoolToTextConverter}}"
+                Command="{Binding ToggleSharingCommand}"
+                BackgroundColor="Green"
+                TextColor="White"
+                HeightRequest="60"
+                FontSize="18"/>
+
+        <ContentPage.Resources>
+            <ResourceDictionary>
+            </ResourceDictionary>
+        </ContentPage.Resources>
+
+    </VerticalStackLayout>
+</ContentPage>

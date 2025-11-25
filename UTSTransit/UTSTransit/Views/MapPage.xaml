@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:maps="clr-namespace:Microsoft.Maui.Controls.Maps;assembly=Microsoft.Maui.Controls.Maps"
+             xmlns:vm="clr-namespace:UTSTransit.ViewModels"
+             x:Class="UTSTransit.Views.MapPage"
+             Title="实时地图">
+
+    <Grid>
+        <maps:Map x:Name="BusMap" IsShowingUser="True">
+
+        </maps:Map>
+
+        <VerticalStackLayout VerticalOptions="End" Margin="20">
+            <Label Text="正在监听巴士位置..." 
+                   BackgroundColor="White" 
+                   Padding="10"
+                   HorizontalOptions="Center"/>
+        </VerticalStackLayout>
+    </Grid>
+</ContentPage>

@@ -3,12 +3,16 @@
     x:Class="UTSTransit.AppShell"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-    xmlns:local="clr-namespace:UTSTransit"
+    xmlns:views="clr-namespace:UTSTransit.Views"
     Title="UTSTransit">
 
-    <ShellContent
-        Title="Home"
-        ContentTemplate="{DataTemplate local:MainPage}"
-        Route="MainPage" />
+    <TabBar>
+        <Tab Title="我是司机" Icon="dotnet_bot.svg">
+            <ShellContent ContentTemplate="{DataTemplate views:DriverPage}" />
+        </Tab>
+        <Tab Title="查看地图" Icon="dotnet_bot.svg">
+            <ShellContent ContentTemplate="{DataTemplate views:MapPage}" />
+        </Tab>
+    </TabBar>
 
 </Shell>
