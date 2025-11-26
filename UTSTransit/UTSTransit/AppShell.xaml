@@ -6,11 +6,12 @@
     xmlns:views="clr-namespace:UTSTransit.Views"
     Title="UTSTransit">
 
+    <!-- 底部导航栏 -->
     <TabBar>
-        <Tab Title="我是司机" Icon="dotnet_bot.svg">
+        <Tab Title="我是司机" Icon="dotnet_bot.png">
             <ShellContent ContentTemplate="{DataTemplate views:DriverPage}" />
         </Tab>
-        <Tab Title="查看地图" Icon="dotnet_bot.svg">
+        <Tab Title="实时地图" Icon="dotnet_bot.png">
             <ShellContent ContentTemplate="{DataTemplate views:MapPage}" />
         </Tab>
     </TabBar>

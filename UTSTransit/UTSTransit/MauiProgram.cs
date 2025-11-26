@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using UTSTransit.Services;
 using UTSTransit.ViewModels;
-using UTSTransit.Views; // 现在这个引用应该正常了
+using UTSTransit.Views;
 
 namespace UTSTransit;
 
@@ -12,21 +12,21 @@ public static class MauiProgram
         var builder = MauiApp.CreateBuilder();
         builder
             .UseMauiApp<App>()
-            .UseMauiMaps() // 启用地图
+            .UseMauiMaps() // <--- 关键：初始化地图组件
             .ConfigureFonts(fonts =>
             {
                 fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
                 fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
             });
 
-        // 1. 注册服务 (Singleton)
+        // 1. 注册核心服务 (单例模式)
         builder.Services.AddSingleton<TransitService>();
 
-        // 2. 注册页面 (Transient - 每次打开都是新的)
+        // 2. 注册页面 (Transient)
         builder.Services.AddTransient<DriverPage>();
         builder.Services.AddTransient<MapPage>();
 
-        // 3. 注册 ViewModel (如果使用依赖注入)
+        // 3. 注册 ViewModels
         builder.Services.AddTransient<DriverViewModel>();
         builder.Services.AddTransient<MapViewModel>();
 

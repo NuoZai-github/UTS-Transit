@@ -30,24 +30,26 @@ namespace UTSTransit.ViewModels
             if (_isSharing)
             {
                 StopLocationUpdates();
-                StatusMessage = "行程已结束，位置共享停止。";
+                StatusMessage = "行程已结束";
                 await _transitService.StopSharing();
             }
             else
             {
-                StatusMessage = "正在获取 GPS...";
+                StatusMessage = "正在启动 GPS...";
                 IsBusy = true;
 
+                await _transitService.InitializeAsync();
                 StartLocationUpdates();
+
                 _isSharing = true;
-                StatusMessage = "行程进行中 - 正在广播位置";
+                StatusMessage = "正在广播位置中...";
             }
         }
 
         private void StartLocationUpdates()
         {
             _timer = Application.Current.Dispatcher.CreateTimer();
-            _timer.Interval = TimeSpan.FromSeconds(5);
+            _timer.Interval = TimeSpan.FromSeconds(5); // 每5秒发送一次
             _timer.Tick += async (s, e) => await SendLocation();
             _timer.Start();
         }
@@ -63,13 +65,14 @@ namespace UTSTransit.ViewModels
         {
             try
             {
+                // 获取 GPS 位置
                 var request = new GeolocationRequest(GeolocationAccuracy.Best, TimeSpan.FromSeconds(10));
                 var location = await Geolocation.Default.GetLocationAsync(request);
 
                 if (location != null)
                 {
                     await _transitService.UpdateBusLocation(SelectedRoute, location.Latitude, location.Longitude);
-                    StatusMessage = $"位置已发送: {DateTime.Now:T}";
+                    StatusMessage = $"位置已更新: {DateTime.Now:T}\nLat: {location.Latitude:F4}, Lng: {location.Longitude:F4}";
                 }
             }
             catch (Exception ex)
