@@ -11,6 +11,7 @@ namespace UTSTransit.ViewModels
     {
         private readonly TransitService _transitService;
 
+        // 存放地图上的大头针
         public ObservableCollection<Pin> BusPins { get; } = new();
 
         public MapViewModel(TransitService transitService)
@@ -21,31 +22,40 @@ namespace UTSTransit.ViewModels
 
         private async void InitializeRealtime()
         {
-            await _transitService.InitializeAsync();
-
-            await _transitService.SubscribeToBusUpdates((bus) =>
+            try
             {
-                MainThread.BeginInvokeOnMainThread(() =>
+                await _transitService.InitializeAsync();
+
+                // 订阅更新
+                await _transitService.SubscribeToBusUpdates((bus) =>
                 {
-                    UpdateMapPin(bus);
+                    MainThread.BeginInvokeOnMainThread(() =>
+                    {
+                        UpdateMapPin(bus);
+                    });
                 });
-            });
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error initializing realtime: {ex.Message}");
+            }
         }
 
         private void UpdateMapPin(BusLocation bus)
         {
-            var existingPin = BusPins.FirstOrDefault(p => p.Label.Contains(bus.RouteName));
+            var existingPin = BusPins.FirstOrDefault(p => p.Label == bus.RouteName);
 
             if (existingPin != null)
             {
                 existingPin.Location = new Location(bus.Latitude, bus.Longitude);
+                existingPin.Address = $"更新于: {bus.LastUpdated.ToLocalTime():T}";
             }
             else
             {
                 var newPin = new Pin
                 {
                     Label = bus.RouteName,
-                    Address = $"最后更新: {bus.LastUpdated.ToLocalTime():T}",
+                    Address = $"更新于: {bus.LastUpdated.ToLocalTime():T}",
                     Type = PinType.Place,
                     Location = new Location(bus.Latitude, bus.Longitude)
                 };

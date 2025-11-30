@@ -7,17 +7,19 @@ namespace UTSTransit.ViewModels
     public partial class DriverViewModel : ObservableObject
     {
         private readonly TransitService _transitService;
-        private IDispatcherTimer _timer;
+        private IDispatcherTimer? _timer;
         private bool _isSharing;
 
+#pragma warning disable MVVMTK0045 // Partial properties are recommended for WinRT compatibility
         [ObservableProperty]
-        private string statusMessage = "等待开始行程...";
+        private string _statusMessage = "等待开始行程...";
 
         [ObservableProperty]
-        private string selectedRoute = "Route A (Dorm -> Campus)";
+        private string _selectedRoute = "Route A (Dorm -> Campus)";
 
         [ObservableProperty]
-        private bool isBusy;
+        private bool _isBusy;
+#pragma warning restore MVVMTK0045
 
         public DriverViewModel(TransitService transitService)
         {
@@ -48,6 +50,8 @@ namespace UTSTransit.ViewModels
 
         private void StartLocationUpdates()
         {
+            if (Application.Current == null) return;
+
             _timer = Application.Current.Dispatcher.CreateTimer();
             _timer.Interval = TimeSpan.FromSeconds(5); // 每5秒发送一次
             _timer.Tick += async (s, e) => await SendLocation();

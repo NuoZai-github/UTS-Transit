@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:UTSTransit.ViewModels"
+             x:Class="UTSTransit.Views.LoginPage"
+             x:DataType="vm:LoginViewModel"
+             Title="登录 - UTS Transit">
+
+    <ScrollView>
+        <VerticalStackLayout Spacing="25" Padding="30" VerticalOptions="Center">
+
+            <Image Source="dotnet_bot.png"
+                   HeightRequest="150"
+                   HorizontalOptions="Center" />
+
+            <Label Text="欢迎使用 UTS 巴士追踪"
+                   FontSize="24"
+                   FontAttributes="Bold"
+                   HorizontalOptions="Center" />
+
+            <Entry Placeholder="邮箱"
+                   Text="{Binding Email}"
+                   Keyboard="Email" />
+
+            <Entry Placeholder="密码"
+                   Text="{Binding Password}"
+                   IsPassword="True" />
+
+            <Label Text="{Binding StatusMessage}"
+                   TextColor="Red"
+                   HorizontalOptions="Center" />
+
+            <ActivityIndicator IsRunning="{Binding IsBusy}"
+                               Color="{StaticResource Primary}" />
+
+            <Button Text="登录"
+                    Command="{Binding LoginCommand}"
+                    BackgroundColor="{StaticResource Primary}"
+                    TextColor="White"
+                    HeightRequest="50" />
+
+            <Button Text="注册"
+                    Command="{Binding RegisterCommand}"
+                    BackgroundColor="Transparent"
+                    TextColor="{StaticResource Primary}"
+                    HeightRequest="50" />
+
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

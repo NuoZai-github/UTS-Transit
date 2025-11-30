@@ -3,7 +3,13 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:vm="clr-namespace:UTSTransit.ViewModels"
              x:Class="UTSTransit.Views.DriverPage"
+             x:DataType="vm:DriverViewModel"
              Title="我是司机">
+
+    <ContentPage.Resources>
+        <ResourceDictionary>
+        </ResourceDictionary>
+    </ContentPage.Resources>
 
     <VerticalStackLayout Spacing="20" Padding="30" VerticalOptions="Center">
 
@@ -19,29 +25,25 @@
                 <x:Array Type="{x:Type x:String}">
                     <x:String>Route A (Dorm -> Campus)</x:String>
                     <x:String>Route B (Campus -> Dorm)</x:String>
-                    <x:String>Route C (Weekend Special)</x:String>
+                    <x:String>周末专线</x:String>
                 </x:Array>
             </Picker.ItemsSource>
         </Picker>
 
         <Label Text="{Binding StatusMessage}" 
                TextColor="Blue"
-               HorizontalOptions="Center" />
+               HorizontalOptions="Center" 
+               HorizontalTextAlignment="Center"/>
 
         <ActivityIndicator IsRunning="{Binding IsBusy}" 
                            Color="Orange" />
 
-        <Button Text="{Binding IsBusy, Converter={StaticResource BoolToTextConverter}}"
+        <Button Text="开始/停止 行程"
                 Command="{Binding ToggleSharingCommand}"
-                BackgroundColor="Green"
+                BackgroundColor="#512BD4"
                 TextColor="White"
                 HeightRequest="60"
                 FontSize="18"/>
-
-        <ContentPage.Resources>
-            <ResourceDictionary>
-            </ResourceDictionary>
-        </ContentPage.Resources>
 
     </VerticalStackLayout>
 </ContentPage>

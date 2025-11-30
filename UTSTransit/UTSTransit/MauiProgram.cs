@@ -23,10 +23,12 @@ public static class MauiProgram
         builder.Services.AddSingleton<TransitService>();
 
         // 2. 注册页面 (Transient)
+        builder.Services.AddTransient<LoginPage>();
         builder.Services.AddTransient<DriverPage>();
         builder.Services.AddTransient<MapPage>();
 
         // 3. 注册 ViewModels
+        builder.Services.AddTransient<LoginViewModel>();
         builder.Services.AddTransient<DriverViewModel>();
         builder.Services.AddTransient<MapViewModel>();
 

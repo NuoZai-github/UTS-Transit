@@ -27,11 +27,49 @@ namespace UTSTransit.Services
             await _client.InitializeAsync();
         }
 
+        // 身份验证：登录
+        public async Task<bool> LoginAsync(string email, string password)
+        {
+            try
+            {
+                var session = await _client.Auth.SignIn(email, password);
+                return session != null;
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Login Failed: {ex.Message}");
+                return false;
+            }
+        }
+
+        // 身份验证：注册
+        public async Task<bool> RegisterAsync(string email, string password)
+        {
+            try
+            {
+                var session = await _client.Auth.SignUp(email, password);
+                return session != null;
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Register Failed: {ex.Message}");
+                return false;
+            }
+        }
+
+        // 身份验证：注销
+        public async Task LogoutAsync()
+        {
+            await _client.Auth.SignOut();
+        }
+
         public string GetCurrentUserId()
         {
-            // 简化版：如果没有登录，给一个模拟ID
-            return _client.Auth.CurrentUser?.Id ?? "simulated-driver-id-001";
+            // 如果没有登录，给一个模拟ID (仅用于测试)
+            return _client.Auth.CurrentUser?.Id ?? "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11";
         }
+
+        public bool IsUserLoggedIn => _client.Auth.CurrentUser != null;
 
         // 司机：上传位置
         public async Task UpdateBusLocation(string routeName, double lat, double lng)
@@ -66,22 +104,21 @@ namespace UTSTransit.Services
             await _client.From<BusLocation>().Where(x => x.DriverId == userId).Delete();
         }
 
-        // 学生：订阅位置
         public async Task SubscribeToBusUpdates(Action<BusLocation> onUpdate)
         {
-            // 使用完整枚举路径
-            await _client.From<BusLocation>()
-                .On(Supabase.Realtime.PostgresChanges.EventType.Update, (sender, change) =>
+            // 使用 ListenType.All 订阅所有事件，然后在回调中过滤
+            var channel = await _client.From<BusLocation>()
+                .On(Supabase.Realtime.PostgresChanges.PostgresChangesOptions.ListenType.All, (sender, change) =>
                 {
-                    var updatedBus = change.Model<BusLocation>();
-                    onUpdate?.Invoke(updatedBus);
-                })
-                .On(Supabase.Realtime.PostgresChanges.EventType.Insert, (sender, change) =>
-                {
-                    var newBus = change.Model<BusLocation>();
-                    onUpdate?.Invoke(newBus);
-                })
-                .Subscribe();
+                    var bus = change.Model<BusLocation>();
+                    // 如果是 Delete 事件，Model<T> 可能返回部分空值的对象，或者我们需要通过其他方式判断
+                    // 这里简单通过检查关键属性是否为空来过滤
+                    if (bus == null || string.IsNullOrEmpty(bus.RouteName)) return;
+
+                    onUpdate?.Invoke(bus);
+                });
+
+            await channel.Subscribe();
         }
     }
 }

@@ -10,10 +10,10 @@ namespace UTSTransit.Models
         public int Id { get; set; }
 
         [Column("driver_id")]
-        public string DriverId { get; set; }
+        public string DriverId { get; set; } = string.Empty;
 
         [Column("route_name")]
-        public string RouteName { get; set; }
+        public string RouteName { get; set; } = string.Empty;
 
         [Column("latitude")]
         public double Latitude { get; set; }
