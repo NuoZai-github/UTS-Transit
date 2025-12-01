@@ -48,14 +48,14 @@ namespace UTSTransit.ViewModels
             if (existingPin != null)
             {
                 existingPin.Location = new Location(bus.Latitude, bus.Longitude);
-                existingPin.Address = $"更新于: {bus.LastUpdated.ToLocalTime():T}";
+                existingPin.Address = $"Updated: {bus.LastUpdated.ToLocalTime():T}";
             }
             else
             {
                 var newPin = new Pin
                 {
                     Label = bus.RouteName,
-                    Address = $"更新于: {bus.LastUpdated.ToLocalTime():T}",
+                    Address = $"Updated: {bus.LastUpdated.ToLocalTime():T}",
                     Type = PinType.Place,
                     Location = new Location(bus.Latitude, bus.Longitude)
                 };

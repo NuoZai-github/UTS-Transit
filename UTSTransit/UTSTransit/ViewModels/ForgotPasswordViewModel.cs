@@ -4,7 +4,7 @@ using UTSTransit.Services;
 
 namespace UTSTransit.ViewModels
 {
-    public partial class LoginViewModel : ObservableObject
+    public partial class ForgotPasswordViewModel : ObservableObject
     {
         private readonly TransitService _transitService;
 
@@ -13,48 +13,42 @@ namespace UTSTransit.ViewModels
         private string _email = string.Empty;
 
         [ObservableProperty]
-        private string _password = string.Empty;
-
-        [ObservableProperty]
         private string _statusMessage = string.Empty;
 
         [ObservableProperty]
         private bool _isBusy;
 #pragma warning restore MVVMTK0045
 
-        public LoginViewModel(TransitService transitService)
+        public ForgotPasswordViewModel(TransitService transitService)
         {
             _transitService = transitService;
         }
 
         [RelayCommand]
-        public async Task Login()
+        public async Task ResetPassword()
         {
             if (IsBusy) return;
-            if (string.IsNullOrWhiteSpace(Email) || string.IsNullOrWhiteSpace(Password))
+            if (string.IsNullOrWhiteSpace(Email))
             {
-                StatusMessage = "Please enter email and password";
+                StatusMessage = "Please enter email";
                 return;
             }
 
             IsBusy = true;
-            StatusMessage = "Logging in...";
+            StatusMessage = "Sending reset email...";
 
             try
             {
-                // 确保 Supabase 已初始化
                 await _transitService.InitializeAsync();
-                
-                var success = await _transitService.LoginAsync(Email, Password);
+
+                var success = await _transitService.ResetPasswordAsync(Email);
                 if (success)
                 {
-                    StatusMessage = "Login Successful!";
-                    // 导航到主页
-                    await Shell.Current.GoToAsync("//MapPage");
+                    StatusMessage = "Reset email sent, please check your inbox.";
                 }
                 else
                 {
-                    StatusMessage = "Login failed, please check your email or password";
+                    StatusMessage = "Failed to send, please check if email is correct";
                 }
             }
             catch (Exception ex)
@@ -68,15 +62,9 @@ namespace UTSTransit.ViewModels
         }
 
         [RelayCommand]
-        public async Task GoToSignUp()
+        public async Task GoBack()
         {
-            await Shell.Current.GoToAsync(nameof(Views.SignUpPage));
-        }
-
-        [RelayCommand]
-        public async Task GoToForgotPassword()
-        {
-            await Shell.Current.GoToAsync(nameof(Views.ForgotPasswordPage));
+            await Shell.Current.GoToAsync("..");
         }
     }
 }

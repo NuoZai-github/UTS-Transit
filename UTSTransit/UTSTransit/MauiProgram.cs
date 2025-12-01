@@ -24,11 +24,15 @@ public static class MauiProgram
 
         // 2. 注册页面 (Transient)
         builder.Services.AddTransient<LoginPage>();
+        builder.Services.AddTransient<SignUpPage>();
+        builder.Services.AddTransient<ForgotPasswordPage>();
         builder.Services.AddTransient<DriverPage>();
         builder.Services.AddTransient<MapPage>();
 
         // 3. 注册 ViewModels
         builder.Services.AddTransient<LoginViewModel>();
+        builder.Services.AddTransient<SignUpViewModel>();
+        builder.Services.AddTransient<ForgotPasswordViewModel>();
         builder.Services.AddTransient<DriverViewModel>();
         builder.Services.AddTransient<MapViewModel>();
 

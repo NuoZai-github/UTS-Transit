@@ -1,0 +1,14 @@
+﻿  Determining projects to restore...
+  All projects are up-to-date for restore.
+  UTSTransit -> C:\Users\ASUS LAPTOP\Desktop\UTS\Mobile App\Assignment\UTS-Transit\UTSTransit\UTSTransit\bin\Debug\net9.0-maccatalyst\maccatalyst-x64\UTSTransit.dll
+  UTSTransit -> C:\Users\ASUS LAPTOP\Desktop\UTS\Mobile App\Assignment\UTS-Transit\UTSTransit\UTSTransit\bin\Debug\net9.0-ios\iossimulator-x64\UTSTransit.dll
+  UTSTransit -> C:\Users\ASUS LAPTOP\Desktop\UTS\Mobile App\Assignment\UTS-Transit\UTSTransit\UTSTransit\bin\Debug\net9.0-android\UTSTransit.dll
+  UTSTransit -> C:\Users\ASUS LAPTOP\Desktop\UTS\Mobile App\Assignment\UTS-Transit\UTSTransit\UTSTransit\bin\Debug\net9.0-windows10.0.19041.0\win10-x64\UTSTransit.dll
+
+Build succeeded.
+    0 Warning(s)
+    0 Error(s)
+
+Time Elapsed 00:00:11.69
+
+Workload updates are available. Run `dotnet workload list` for more information.

@@ -63,6 +63,21 @@ namespace UTSTransit.Services
             await _client.Auth.SignOut();
         }
 
+        // 身份验证：重置密码
+        public async Task<bool> ResetPasswordAsync(string email)
+        {
+            try
+            {
+                await _client.Auth.ResetPasswordForEmail(email);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Reset Password Failed: {ex.Message}");
+                return false;
+            }
+        }
+
         public string GetCurrentUserId()
         {
             // 如果没有登录，给一个模拟ID (仅用于测试)

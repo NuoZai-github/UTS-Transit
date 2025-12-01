@@ -4,14 +4,14 @@
              xmlns:maps="clr-namespace:Microsoft.Maui.Controls.Maps;assembly=Microsoft.Maui.Controls.Maps"
              xmlns:vm="clr-namespace:UTSTransit.ViewModels"
              x:Class="UTSTransit.Views.MapPage"
-             Title="实时地图">
+             Title="Live Map">
 
     <Grid>
-        <!-- 地图控件 -->
+        <!-- Map Control -->
         <maps:Map x:Name="BusMap" IsShowingUser="True" />
 
         <VerticalStackLayout VerticalOptions="End" Margin="20">
-            <Label Text="正在监听巴士位置..." 
+            <Label Text="Listening for bus locations..." 
                    BackgroundColor="White" 
                    Padding="10"
                    HorizontalOptions="Center"

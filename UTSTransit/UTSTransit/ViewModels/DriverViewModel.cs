@@ -12,7 +12,7 @@ namespace UTSTransit.ViewModels
 
 #pragma warning disable MVVMTK0045 // Partial properties are recommended for WinRT compatibility
         [ObservableProperty]
-        private string _statusMessage = "等待开始行程...";
+        private string _statusMessage = "Waiting to start trip...";
 
         [ObservableProperty]
         private string _selectedRoute = "Route A (Dorm -> Campus)";
@@ -32,19 +32,19 @@ namespace UTSTransit.ViewModels
             if (_isSharing)
             {
                 StopLocationUpdates();
-                StatusMessage = "行程已结束";
+                StatusMessage = "Trip Ended";
                 await _transitService.StopSharing();
             }
             else
             {
-                StatusMessage = "正在启动 GPS...";
+                StatusMessage = "Starting GPS...";
                 IsBusy = true;
 
                 await _transitService.InitializeAsync();
                 StartLocationUpdates();
 
                 _isSharing = true;
-                StatusMessage = "正在广播位置中...";
+                StatusMessage = "Broadcasting location...";
             }
         }
 
@@ -53,7 +53,7 @@ namespace UTSTransit.ViewModels
             if (Application.Current == null) return;
 
             _timer = Application.Current.Dispatcher.CreateTimer();
-            _timer.Interval = TimeSpan.FromSeconds(5); // 每5秒发送一次
+            _timer.Interval = TimeSpan.FromSeconds(5); // Send every 5 seconds
             _timer.Tick += async (s, e) => await SendLocation();
             _timer.Start();
         }
@@ -69,19 +69,19 @@ namespace UTSTransit.ViewModels
         {
             try
             {
-                // 获取 GPS 位置
+                // Get GPS Location
                 var request = new GeolocationRequest(GeolocationAccuracy.Best, TimeSpan.FromSeconds(10));
                 var location = await Geolocation.Default.GetLocationAsync(request);
 
                 if (location != null)
                 {
                     await _transitService.UpdateBusLocation(SelectedRoute, location.Latitude, location.Longitude);
-                    StatusMessage = $"位置已更新: {DateTime.Now:T}\nLat: {location.Latitude:F4}, Lng: {location.Longitude:F4}";
+                    StatusMessage = $"Location Updated: {DateTime.Now:T}\nLat: {location.Latitude:F4}, Lng: {location.Longitude:F4}";
                 }
             }
             catch (Exception ex)
             {
-                StatusMessage = $"GPS 错误: {ex.Message}";
+                StatusMessage = $"GPS Error: {ex.Message}";
             }
         }
     }

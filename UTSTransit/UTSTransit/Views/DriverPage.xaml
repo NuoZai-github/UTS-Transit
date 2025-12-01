@@ -4,7 +4,7 @@
              xmlns:vm="clr-namespace:UTSTransit.ViewModels"
              x:Class="UTSTransit.Views.DriverPage"
              x:DataType="vm:DriverViewModel"
-             Title="我是司机">
+             Title="Driver App">
 
     <ContentPage.Resources>
         <ResourceDictionary>
@@ -13,19 +13,19 @@
 
     <VerticalStackLayout Spacing="20" Padding="30" VerticalOptions="Center">
 
-        <Label Text="🚌 巴士追踪 - 司机端" 
+        <Label Text="🚌 Bus Tracker - Driver App" 
                FontSize="24" 
                HorizontalOptions="Center" 
                FontAttributes="Bold"/>
 
-        <Label Text="选择当前路线:" />
+        <Label Text="Select Current Route:" />
 
         <Picker SelectedItem="{Binding SelectedRoute}">
             <Picker.ItemsSource>
                 <x:Array Type="{x:Type x:String}">
                     <x:String>Route A (Dorm -> Campus)</x:String>
                     <x:String>Route B (Campus -> Dorm)</x:String>
-                    <x:String>周末专线</x:String>
+                    <x:String>Weekend Special</x:String>
                 </x:Array>
             </Picker.ItemsSource>
         </Picker>
@@ -38,7 +38,7 @@
         <ActivityIndicator IsRunning="{Binding IsBusy}" 
                            Color="Orange" />
 
-        <Button Text="开始/停止 行程"
+        <Button Text="Start/Stop Trip"
                 Command="{Binding ToggleSharingCommand}"
                 BackgroundColor="#512BD4"
                 TextColor="White"
