@@ -29,6 +29,9 @@ public static class MauiProgram
         builder.Services.AddTransient<ForgotPasswordPage>();
         builder.Services.AddTransient<DriverPage>();
         builder.Services.AddTransient<MapPage>();
+        builder.Services.AddTransient<TimetablePage>();
+        builder.Services.AddTransient<AnnouncementsPage>();
+        builder.Services.AddTransient<ProfilePage>();
 
         // 3. 注册 ViewModels
         builder.Services.AddTransient<LoginViewModel>();
@@ -36,6 +39,9 @@ public static class MauiProgram
         builder.Services.AddTransient<ForgotPasswordViewModel>();
         builder.Services.AddTransient<DriverViewModel>();
         builder.Services.AddTransient<MapViewModel>();
+        builder.Services.AddTransient<TimetableViewModel>();
+        builder.Services.AddTransient<AnnouncementsViewModel>();
+        builder.Services.AddTransient<ProfileViewModel>();
 
 #if DEBUG
         builder.Logging.AddDebug();

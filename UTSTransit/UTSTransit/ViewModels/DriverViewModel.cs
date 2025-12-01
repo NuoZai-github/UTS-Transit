@@ -24,11 +24,28 @@ namespace UTSTransit.ViewModels
         public DriverViewModel(TransitService transitService)
         {
             _transitService = transitService;
+            CheckDriverRole();
+        }
+
+        private void CheckDriverRole()
+        {
+            var role = _transitService.GetCurrentUserRole();
+            if (role != "driver")
+            {
+                StatusMessage = "Access Denied: You are not registered as a driver.";
+            }
         }
 
         [RelayCommand]
         public async Task ToggleSharing()
         {
+            var role = _transitService.GetCurrentUserRole();
+            if (role != "driver")
+            {
+                StatusMessage = "Only drivers can share location.";
+                return;
+            }
+
             if (_isSharing)
             {
                 StopLocationUpdates();

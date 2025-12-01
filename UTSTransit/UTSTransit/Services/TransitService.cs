@@ -43,11 +43,19 @@ namespace UTSTransit.Services
         }
 
         // 身份验证：注册
-        public async Task<bool> RegisterAsync(string email, string password)
+        public async Task<bool> RegisterAsync(string email, string password, string role)
         {
             try
             {
-                var session = await _client.Auth.SignUp(email, password);
+                var options = new Supabase.Gotrue.SessionOptions
+                {
+                    Data = new Dictionary<string, object>
+                    {
+                        { "role", role }
+                    }
+                };
+
+                var session = await _client.Auth.SignUp(email, password, options);
                 return session != null;
             }
             catch (Exception ex)
@@ -84,7 +92,47 @@ namespace UTSTransit.Services
             return _client.Auth.CurrentUser?.Id ?? "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11";
         }
 
+        public string GetCurrentUserEmail()
+        {
+            return _client.Auth.CurrentUser?.Email ?? "Guest User";
+        }
+
+        public string GetCurrentUserRole()
+        {
+            if (_client.Auth.CurrentUser?.UserMetadata != null &&
+                _client.Auth.CurrentUser.UserMetadata.ContainsKey("role"))
+            {
+                return _client.Auth.CurrentUser.UserMetadata["role"].ToString();
+            }
+            return "student"; // Default to student
+        }
+
         public bool IsUserLoggedIn => _client.Auth.CurrentUser != null;
+
+        public List<Models.Announcement> GetAnnouncements()
+        {
+            return new List<Models.Announcement>
+            {
+                new Models.Announcement
+                {
+                    Title = "Heavy Rain Warning",
+                    Content = "Due to heavy rain, buses on Route B may be delayed by 10-15 minutes.",
+                    Date = DateTime.Now
+                },
+                new Models.Announcement
+                {
+                    Title = "Exam Week Schedule",
+                    Content = "During exam week, we will be adding extra buses on Route A between 8 AM and 10 AM.",
+                    Date = DateTime.Now.AddDays(-2)
+                },
+                new Models.Announcement
+                {
+                    Title = "App Maintenance",
+                    Content = "The UTS Transit app will undergo maintenance this Sunday from 2 AM to 4 AM.",
+                    Date = DateTime.Now.AddDays(-5)
+                }
+            };
+        }
 
         // 司机：上传位置
         public async Task UpdateBusLocation(string routeName, double lat, double lng)

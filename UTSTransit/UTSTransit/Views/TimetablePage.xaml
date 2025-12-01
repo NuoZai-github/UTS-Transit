@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:UTSTransit.ViewModels"
+             xmlns:models="clr-namespace:UTSTransit.Models"
+             x:Class="UTSTransit.Views.TimetablePage"
+             x:DataType="vm:TimetableViewModel"
+             Title="Schedule">
+
+    <Grid RowDefinitions="Auto, *">
+        <Label Text="Bus Schedule"
+               FontSize="24"
+               FontAttributes="Bold"
+               Padding="20"
+               HorizontalOptions="Center" />
+
+        <CollectionView Grid.Row="1" ItemsSource="{Binding Schedule}" Margin="10">
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="models:TimetableItem">
+                    <Frame Margin="5" Padding="10" BorderColor="LightGray" CornerRadius="10">
+                        <Grid ColumnDefinitions="*, Auto, Auto">
+                            <VerticalStackLayout Grid.Column="0" Spacing="2">
+                                <Label Text="{Binding RouteName}" FontAttributes="Bold" FontSize="16" />
+                                <Label Text="{Binding DepartureTime}" TextColor="Gray" />
+                            </VerticalStackLayout>
+                            
+                            <Label Grid.Column="2" 
+                                   Text="{Binding Status}" 
+                                   TextColor="{Binding StatusColor}" 
+                                   FontAttributes="Bold"
+                                   VerticalOptions="Center" />
+                        </Grid>
+                    </Frame>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+    </Grid>
+</ContentPage>

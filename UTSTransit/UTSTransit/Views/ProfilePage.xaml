@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:UTSTransit.ViewModels"
+             x:Class="UTSTransit.Views.ProfilePage"
+             x:DataType="vm:ProfileViewModel"
+             Title="Profile">
+
+    <VerticalStackLayout Spacing="20" Padding="30" VerticalOptions="Center">
+
+        <Image Source="dotnet_bot.png"
+               HeightRequest="120"
+               WidthRequest="120"
+               HorizontalOptions="Center" />
+
+        <Label Text="User Profile"
+               FontSize="24"
+               FontAttributes="Bold"
+               HorizontalOptions="Center" />
+
+        <Frame Padding="20" BorderColor="LightGray" CornerRadius="10">
+            <VerticalStackLayout Spacing="10">
+                <Label Text="Email Address:" TextColor="Gray" FontSize="14" />
+                <Label Text="{Binding UserEmail}" FontSize="18" FontAttributes="Bold" TextColor="Black" />
+            </VerticalStackLayout>
+        </Frame>
+
+        <Button Text="Logout"
+                Command="{Binding LogoutCommand}"
+                BackgroundColor="Red"
+                TextColor="White"
+                HeightRequest="50"
+                Margin="0,20,0,0" />
+
+    </VerticalStackLayout>
+</ContentPage>

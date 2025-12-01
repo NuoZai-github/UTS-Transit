@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:UTSTransit.ViewModels"
+             xmlns:models="clr-namespace:UTSTransit.Models"
+             x:Class="UTSTransit.Views.AnnouncementsPage"
+             x:DataType="vm:AnnouncementsViewModel"
+             Title="Announcements">
+
+    <Grid RowDefinitions="Auto, *">
+        <Label Text="Latest News"
+               FontSize="24"
+               FontAttributes="Bold"
+               Padding="20"
+               HorizontalOptions="Center" />
+
+        <CollectionView Grid.Row="1" ItemsSource="{Binding Announcements}" Margin="10">
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="models:Announcement">
+                    <Frame Margin="5" Padding="15" BorderColor="LightGray" CornerRadius="10" HasShadow="True">
+                        <VerticalStackLayout Spacing="5">
+                            <Label Text="{Binding Title}" FontAttributes="Bold" FontSize="18" TextColor="{StaticResource Primary}" />
+                            <Label Text="{Binding DateString}" FontSize="12" TextColor="Gray" />
+                            <Label Text="{Binding Content}" FontSize="14" TextColor="Black" Margin="0,5,0,0" />
+                        </VerticalStackLayout>
+                    </Frame>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+    </Grid>
+</ContentPage>

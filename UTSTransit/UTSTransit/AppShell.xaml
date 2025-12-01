@@ -14,8 +14,17 @@
         <Tab Title="I am Driver" Icon="dotnet_bot.png">
             <ShellContent ContentTemplate="{DataTemplate views:DriverPage}" />
         </Tab>
+        <Tab Title="Schedule" Icon="dotnet_bot.png">
+            <ShellContent ContentTemplate="{DataTemplate views:TimetablePage}" />
+        </Tab>
         <Tab Title="Live Map" Icon="dotnet_bot.png">
             <ShellContent ContentTemplate="{DataTemplate views:MapPage}" Route="MapPage" />
+        </Tab>
+        <Tab Title="News" Icon="dotnet_bot.png">
+            <ShellContent ContentTemplate="{DataTemplate views:AnnouncementsPage}" />
+        </Tab>
+        <Tab Title="Profile" Icon="dotnet_bot.png">
+            <ShellContent ContentTemplate="{DataTemplate views:ProfilePage}" />
         </Tab>
     </TabBar>
 

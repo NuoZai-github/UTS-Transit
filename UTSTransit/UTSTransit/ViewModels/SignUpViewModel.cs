@@ -19,6 +19,12 @@ namespace UTSTransit.ViewModels
         private string _confirmPassword = string.Empty;
 
         [ObservableProperty]
+        private bool _isDriver;
+
+        [ObservableProperty]
+        private string _verificationCode = string.Empty;
+
+        [ObservableProperty]
         private string _statusMessage = string.Empty;
 
         [ObservableProperty]
@@ -34,35 +40,47 @@ namespace UTSTransit.ViewModels
         public async Task Register()
         {
             if (IsBusy) return;
+
             if (string.IsNullOrWhiteSpace(Email) || string.IsNullOrWhiteSpace(Password))
             {
-                StatusMessage = "Please enter email and password";
+                StatusMessage = "Please enter email and password.";
                 return;
             }
 
             if (Password != ConfirmPassword)
             {
-                StatusMessage = "Passwords do not match";
+                StatusMessage = "Passwords do not match.";
                 return;
             }
 
+            string role = "student";
+
+            if (IsDriver)
+            {
+                if (string.IsNullOrWhiteSpace(VerificationCode) || VerificationCode.ToUpper() != "LIME6199")
+                {
+                    StatusMessage = "Invalid Verification Code. Please contact lime6199@gmail.com.";
+                    return;
+                }
+                role = "driver";
+            }
+
             IsBusy = true;
-            StatusMessage = "Registering...";
+            StatusMessage = "Creating account...";
 
             try
             {
                 await _transitService.InitializeAsync();
+                bool success = await _transitService.RegisterAsync(Email, Password, role);
 
-                var success = await _transitService.RegisterAsync(Email, Password);
                 if (success)
                 {
-                    StatusMessage = "Registration successful! Please check your email or login directly.";
-                    // 注册成功后返回登录页
+                    StatusMessage = "Registration successful! Please login.";
                     await Shell.Current.GoToAsync("..");
                 }
                 else
                 {
-                    StatusMessage = "Registration failed, please try again later";
+                    StatusMessage = "Registration failed. Try again.";
                 }
             }
             catch (Exception ex)

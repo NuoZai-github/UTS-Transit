@@ -4,7 +4,7 @@
              xmlns:vm="clr-namespace:UTSTransit.ViewModels"
              x:Class="UTSTransit.Views.SignUpPage"
              x:DataType="vm:SignUpViewModel"
-             Title="注册 - UTS Transit">
+             Title="Register">
 
     <ScrollView>
         <VerticalStackLayout Spacing="25" Padding="30" VerticalOptions="Center">
@@ -25,6 +25,15 @@
             <Entry Placeholder="Confirm Password"
                    Text="{Binding ConfirmPassword}"
                    IsPassword="True" />
+
+            <HorizontalStackLayout Spacing="10" VerticalOptions="Center">
+                <Label Text="I am a Driver" VerticalOptions="Center" />
+                <Switch IsToggled="{Binding IsDriver}" />
+            </HorizontalStackLayout>
+
+            <Entry Placeholder="Driver Verification Code (Required for Drivers)"
+                   Text="{Binding VerificationCode}"
+                   IsVisible="{Binding IsDriver}" />
 
             <Label Text="{Binding StatusMessage}"
                    TextColor="Red"
