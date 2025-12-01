@@ -10,13 +10,19 @@ namespace UTSTransit.ViewModels
     public partial class MapViewModel : ObservableObject
     {
         private readonly TransitService _transitService;
+        private readonly RouteService _routeService;
 
         // 存放地图上的大头针
         public ObservableCollection<Pin> BusPins { get; } = new();
 
-        public MapViewModel(TransitService transitService)
+        // 存放路线信息
+        public List<RouteInfo> Routes { get; private set; }
+
+        public MapViewModel(TransitService transitService, RouteService routeService)
         {
             _transitService = transitService;
+            _routeService = routeService;
+            Routes = _routeService.GetRoutes();
             InitializeRealtime();
         }
 

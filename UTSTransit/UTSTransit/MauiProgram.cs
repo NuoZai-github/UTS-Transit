@@ -21,6 +21,7 @@ public static class MauiProgram
 
         // 1. 注册核心服务 (单例模式)
         builder.Services.AddSingleton<TransitService>();
+        builder.Services.AddSingleton<RouteService>();
 
         // 2. 注册页面 (Transient)
         builder.Services.AddTransient<LoginPage>();
