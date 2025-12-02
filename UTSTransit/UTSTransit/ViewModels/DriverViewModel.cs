@@ -18,6 +18,18 @@ namespace UTSTransit.ViewModels
         private string _selectedRoute = "Route A (Dorm -> Campus)";
 
         [ObservableProperty]
+        private string _selectedStatus = "Driving";
+
+        public List<string> StatusOptions { get; } = new List<string>
+        {
+            "Driving",
+            "Resting",
+            "Arrived at Campus",
+            "Arrived at Hostel",
+            "Service Stopped"
+        };
+
+        [ObservableProperty]
         private bool _isBusy;
 #pragma warning restore MVVMTK0045
 
@@ -61,7 +73,7 @@ namespace UTSTransit.ViewModels
                 StartLocationUpdates();
 
                 _isSharing = true;
-                StatusMessage = "Broadcasting location...";
+                StatusMessage = $"Broadcasting: {SelectedStatus}";
             }
         }
 
@@ -92,8 +104,8 @@ namespace UTSTransit.ViewModels
 
                 if (location != null)
                 {
-                    await _transitService.UpdateBusLocation(SelectedRoute, location.Latitude, location.Longitude);
-                    StatusMessage = $"Location Updated: {DateTime.Now:T}\nLat: {location.Latitude:F4}, Lng: {location.Longitude:F4}";
+                    await _transitService.UpdateBusLocation(SelectedRoute, location.Latitude, location.Longitude, SelectedStatus);
+                    StatusMessage = $"Status: {SelectedStatus}\nLat: {location.Latitude:F4}, Lng: {location.Longitude:F4}";
                 }
             }
             catch (Exception ex)

@@ -71,16 +71,16 @@ namespace UTSTransit.ViewModels
             try
             {
                 await _transitService.InitializeAsync();
-                bool success = await _transitService.RegisterAsync(Email, Password, role);
+                var result = await _transitService.RegisterAsync(Email, Password, role);
 
-                if (success)
+                if (result.IsSuccess)
                 {
                     StatusMessage = "Registration successful! Please login.";
                     await Shell.Current.GoToAsync("..");
                 }
                 else
                 {
-                    StatusMessage = "Registration failed. Try again.";
+                    StatusMessage = $"Registration failed: {result.ErrorMessage}";
                 }
             }
             catch (Exception ex)

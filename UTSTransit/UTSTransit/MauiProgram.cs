@@ -32,6 +32,7 @@ public static class MauiProgram
         builder.Services.AddTransient<TimetablePage>();
         builder.Services.AddTransient<AnnouncementsPage>();
         builder.Services.AddTransient<ProfilePage>();
+        builder.Services.AddTransient<HomePage>();
 
         // 3. 注册 ViewModels
         builder.Services.AddTransient<LoginViewModel>();
@@ -42,6 +43,7 @@ public static class MauiProgram
         builder.Services.AddTransient<TimetableViewModel>();
         builder.Services.AddTransient<AnnouncementsViewModel>();
         builder.Services.AddTransient<ProfileViewModel>();
+        builder.Services.AddTransient<HomePageViewModel>();
 
 #if DEBUG
         builder.Logging.AddDebug();

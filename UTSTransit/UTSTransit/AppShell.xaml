@@ -11,8 +11,11 @@
 
     <!-- Bottom Tab Bar -->
     <TabBar Route="MainTabs">
-        <Tab Title="I am Driver" Icon="dotnet_bot.png">
+        <Tab Title="I am Driver" Icon="dotnet_bot.png" x:Name="DriverTab" IsVisible="False">
             <ShellContent ContentTemplate="{DataTemplate views:DriverPage}" />
+        </Tab>
+        <Tab Title="Home" Icon="dotnet_bot.png">
+            <ShellContent ContentTemplate="{DataTemplate views:HomePage}" />
         </Tab>
         <Tab Title="Schedule" Icon="dotnet_bot.png">
             <ShellContent ContentTemplate="{DataTemplate views:TimetablePage}" />

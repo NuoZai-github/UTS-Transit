@@ -23,5 +23,8 @@ namespace UTSTransit.Models
 
         [Column("last_updated")]
         public DateTime LastUpdated { get; set; }
+
+        [Column("status")]
+        public string Status { get; set; } = "Stopped";
     }
 }

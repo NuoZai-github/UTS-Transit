@@ -17,7 +17,7 @@ namespace UTSTransit.Services
             var options = new Supabase.SupabaseOptions
             {
                 AutoRefreshToken = true,
-                AutoConnectRealtime = true
+                AutoConnectRealtime = false // Disable auto-connect to prevent startup errors
             };
             _client = new Supabase.Client(SupabaseUrl, SupabaseKey, options);
         }
@@ -25,6 +25,21 @@ namespace UTSTransit.Services
         public async Task InitializeAsync()
         {
             await _client.InitializeAsync();
+        }
+
+        public async Task ConnectRealtimeAsync()
+        {
+            try
+            {
+                if (_client.Realtime.Socket == null || !_client.Realtime.Socket.IsConnected)
+                {
+                    await _client.Realtime.ConnectAsync();
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Realtime Connect Failed: {ex.Message}");
+            }
         }
 
         // 身份验证：登录
@@ -43,11 +58,11 @@ namespace UTSTransit.Services
         }
 
         // 身份验证：注册
-        public async Task<bool> RegisterAsync(string email, string password, string role)
+        public async Task<(bool IsSuccess, string ErrorMessage)> RegisterAsync(string email, string password, string role)
         {
             try
             {
-                var options = new Supabase.Gotrue.SessionOptions
+                var options = new Supabase.Gotrue.SignUpOptions
                 {
                     Data = new Dictionary<string, object>
                     {
@@ -56,12 +71,24 @@ namespace UTSTransit.Services
                 };
 
                 var session = await _client.Auth.SignUp(email, password, options);
-                return session != null;
+                
+                if (session == null)
+                    return (false, "Unknown error: Session is null.");
+
+                if (session.User != null && session.User.Identities != null && session.User.Identities.Count == 0)
+                     return (false, "User already exists or email is invalid.");
+
+                return (true, string.Empty);
+            }
+            catch (HttpRequestException httpEx)
+            {
+                Debug.WriteLine($"Register Network Error: {httpEx.Message}");
+                return (false, "Network error. Please check your internet connection or if the Supabase project is paused.");
             }
             catch (Exception ex)
             {
                 Debug.WriteLine($"Register Failed: {ex.Message}");
-                return false;
+                return (false, ex.Message);
             }
         }
 
@@ -135,8 +162,10 @@ namespace UTSTransit.Services
         }
 
         // 司机：上传位置
-        public async Task UpdateBusLocation(string routeName, double lat, double lng)
+        public async Task UpdateBusLocation(string routeName, double lat, double lng, string status)
         {
+            await ConnectRealtimeAsync(); // Ensure connected
+
             var userId = GetCurrentUserId();
 
             var location = new BusLocation
@@ -145,6 +174,7 @@ namespace UTSTransit.Services
                 RouteName = routeName,
                 Latitude = lat,
                 Longitude = lng,
+                Status = status,
                 LastUpdated = DateTime.UtcNow
             };
 
@@ -152,7 +182,7 @@ namespace UTSTransit.Services
             {
                 // Upsert: 更新或插入
                 await _client.From<BusLocation>().Upsert(location);
-                Debug.WriteLine($"[Driver] Uploaded: {lat}, {lng}");
+                Debug.WriteLine($"[Driver] Uploaded: {lat}, {lng}, {status}");
             }
             catch (Exception ex)
             {
@@ -169,6 +199,8 @@ namespace UTSTransit.Services
 
         public async Task SubscribeToBusUpdates(Action<BusLocation> onUpdate)
         {
+            await ConnectRealtimeAsync(); // Ensure connected
+
             // 使用 ListenType.All 订阅所有事件，然后在回调中过滤
             var channel = await _client.From<BusLocation>()
                 .On(Supabase.Realtime.PostgresChanges.PostgresChangesOptions.ListenType.All, (sender, change) =>

@@ -24,6 +24,13 @@ namespace UTSTransit.ViewModels
             if (confirm)
             {
                 await _transitService.LogoutAsync();
+                
+                // Reset UI state
+                if (Shell.Current is AppShell appShell)
+                {
+                    appShell.SetDriverTabVisible(false);
+                }
+
                 // Navigate back to Login Page
                 await Shell.Current.GoToAsync("//LoginPage");
             }

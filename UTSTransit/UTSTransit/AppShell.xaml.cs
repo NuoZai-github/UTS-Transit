@@ -5,9 +5,16 @@
         public AppShell()
         {
             InitializeComponent();
+            Routing.RegisterRoute("SignUpPage", typeof(Views.SignUpPage));
+            Routing.RegisterRoute("ForgotPasswordPage", typeof(Views.ForgotPasswordPage));
+        }
 
-            Routing.RegisterRoute(nameof(Views.SignUpPage), typeof(Views.SignUpPage));
-            Routing.RegisterRoute(nameof(Views.ForgotPasswordPage), typeof(Views.ForgotPasswordPage));
+        public void SetDriverTabVisible(bool isVisible)
+        {
+            if (DriverTab != null)
+            {
+                DriverTab.IsVisible = isVisible;
+            }
         }
     }
 }

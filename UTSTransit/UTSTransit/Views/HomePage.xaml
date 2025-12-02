@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:UTSTransit.ViewModels"
+             x:Class="UTSTransit.Views.HomePage"
+             x:DataType="vm:HomePageViewModel"
+             Title="Home">
+
+    <Grid RowDefinitions="Auto, *, Auto" Padding="20" BackgroundColor="#F0F0F0">
+        
+        <!-- Header -->
+        <Label Text="UTS Transit Status" 
+               FontSize="28" 
+               FontAttributes="Bold" 
+               HorizontalOptions="Center" 
+               TextColor="#333"/>
+
+        <!-- Animation Area -->
+        <Grid Grid.Row="1" VerticalOptions="Center">
+            <!-- Road -->
+            <BoxView HeightRequest="4" Color="Gray" VerticalOptions="Center" />
+            
+            <!-- Bus Image -->
+            <Image x:Name="BusImage" 
+                   Source="dotnet_bot.png" 
+                   HeightRequest="100" 
+                   WidthRequest="100" 
+                   HorizontalOptions="Start" 
+                   VerticalOptions="Center"/>
+            
+            <!-- Stop Sign (Hidden by default) -->
+            <Label x:Name="StopSign"
+                   Text="🛑"
+                   FontSize="80"
+                   HorizontalOptions="Center"
+                   VerticalOptions="Center"
+                   IsVisible="False"/>
+            
+            <!-- Zzz (Hidden by default) -->
+            <Label x:Name="ZzzText"
+                   Text="Zzz..."
+                   FontSize="40"
+                   TextColor="Blue"
+                   HorizontalOptions="Center"
+                   VerticalOptions="Start"
+                   TranslationY="-50"
+                   IsVisible="False"/>
+        </Grid>
+
+        <!-- Status Text -->
+        <VerticalStackLayout Grid.Row="2" Spacing="10" VerticalOptions="End" Padding="0,0,0,20">
+            <Label Text="{Binding StatusText}" 
+                   FontSize="22" 
+                   HorizontalOptions="Center" 
+                   HorizontalTextAlignment="Center"
+                   TextColor="#512BD4"
+                   FontAttributes="Bold"/>
+            
+            <Label Text="{Binding LastUpdatedText}" 
+                   FontSize="14" 
+                   TextColor="Gray" 
+                   HorizontalOptions="Center"/>
+        </VerticalStackLayout>
+    </Grid>
+</ContentPage>

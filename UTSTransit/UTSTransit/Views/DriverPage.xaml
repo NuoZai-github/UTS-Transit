@@ -30,6 +30,10 @@
             </Picker.ItemsSource>
         </Picker>
 
+        <Label Text="Current Status:" />
+        <Picker ItemsSource="{Binding StatusOptions}" 
+                SelectedItem="{Binding SelectedStatus}" />
+
         <Label Text="{Binding StatusMessage}" 
                TextColor="Blue"
                HorizontalOptions="Center" 

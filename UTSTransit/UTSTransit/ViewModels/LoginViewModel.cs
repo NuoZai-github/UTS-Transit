@@ -49,8 +49,16 @@ namespace UTSTransit.ViewModels
                 if (success)
                 {
                     StatusMessage = "Login Successful!";
-                    // 导航到主页
-                    await Shell.Current.GoToAsync("//MapPage");
+                    
+                    // Check role and update UI
+                    var role = _transitService.GetCurrentUserRole();
+                    if (Shell.Current is AppShell appShell)
+                    {
+                        appShell.SetDriverTabVisible(role == "driver");
+                    }
+
+                    // Navigate to main page
+                    await Shell.Current.GoToAsync("//MainTabs");
                 }
                 else
                 {
@@ -70,13 +78,13 @@ namespace UTSTransit.ViewModels
         [RelayCommand]
         public async Task GoToSignUp()
         {
-            await Shell.Current.GoToAsync(nameof(Views.SignUpPage));
+            await Shell.Current.GoToAsync("SignUpPage");
         }
 
         [RelayCommand]
         public async Task GoToForgotPassword()
         {
-            await Shell.Current.GoToAsync(nameof(Views.ForgotPasswordPage));
+            await Shell.Current.GoToAsync("ForgotPasswordPage");
         }
     }
 }
