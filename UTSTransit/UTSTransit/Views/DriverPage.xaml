@@ -4,50 +4,51 @@
              xmlns:vm="clr-namespace:UTSTransit.ViewModels"
              x:Class="UTSTransit.Views.DriverPage"
              x:DataType="vm:DriverViewModel"
-             Title="Driver App">
+             Title="Driver Console">
 
-    <ContentPage.Resources>
-        <ResourceDictionary>
-        </ResourceDictionary>
-    </ContentPage.Resources>
+    <ScrollView>
+        <VerticalStackLayout Spacing="24" Padding="24" VerticalOptions="Center">
 
-    <VerticalStackLayout Spacing="20" Padding="30" VerticalOptions="Center">
+            <Label Text="Driver Console" 
+                   Style="{StaticResource HeaderLabel}" />
 
-        <Label Text="🚌 Bus Tracker - Driver App" 
-               FontSize="24" 
-               HorizontalOptions="Center" 
-               FontAttributes="Bold"/>
+            <VerticalStackLayout Spacing="8">
+                <Label Text="Select Route" Style="{StaticResource SubHeaderLabel}" HorizontalOptions="Start"/>
+                <Border Style="{StaticResource InputBorder}">
+                    <Picker SelectedItem="{Binding SelectedRoute}" Title="Select a route">
+                        <Picker.ItemsSource>
+                            <x:Array Type="{x:Type x:String}">
+                                <x:String>Route A (Dorm -> Campus)</x:String>
+                                <x:String>Route B (Campus -> Hostel)</x:String>
+                                <x:String>Weekend Special</x:String>
+                            </x:Array>
+                        </Picker.ItemsSource>
+                    </Picker>
+                </Border>
+            </VerticalStackLayout>
 
-        <Label Text="Select Current Route:" />
+            <VerticalStackLayout Spacing="8">
+                <Label Text="Current Status" Style="{StaticResource SubHeaderLabel}" HorizontalOptions="Start"/>
+                <Border Style="{StaticResource InputBorder}">
+                    <Picker ItemsSource="{Binding StatusOptions}" 
+                            SelectedItem="{Binding SelectedStatus}"
+                            Title="Select status"/>
+                </Border>
+            </VerticalStackLayout>
 
-        <Picker SelectedItem="{Binding SelectedRoute}">
-            <Picker.ItemsSource>
-                <x:Array Type="{x:Type x:String}">
-                    <x:String>Route A (Dorm -> Campus)</x:String>
-                    <x:String>Route B (Campus -> Dorm)</x:String>
-                    <x:String>Weekend Special</x:String>
-                </x:Array>
-            </Picker.ItemsSource>
-        </Picker>
+            <Label Text="{Binding StatusMessage}" 
+                   TextColor="{StaticResource Primary}"
+                   HorizontalOptions="Center" 
+                   HorizontalTextAlignment="Center"
+                   FontAttributes="Bold"/>
 
-        <Label Text="Current Status:" />
-        <Picker ItemsSource="{Binding StatusOptions}" 
-                SelectedItem="{Binding SelectedStatus}" />
+            <ActivityIndicator IsRunning="{Binding IsBusy}" 
+                               HorizontalOptions="Center" />
 
-        <Label Text="{Binding StatusMessage}" 
-               TextColor="Blue"
-               HorizontalOptions="Center" 
-               HorizontalTextAlignment="Center"/>
+            <Button Text="Start / Stop Trip"
+                    Command="{Binding ToggleSharingCommand}"
+                    Margin="0,16,0,0"/>
 
-        <ActivityIndicator IsRunning="{Binding IsBusy}" 
-                           Color="Orange" />
-
-        <Button Text="Start/Stop Trip"
-                Command="{Binding ToggleSharingCommand}"
-                BackgroundColor="#512BD4"
-                TextColor="White"
-                HeightRequest="60"
-                FontSize="18"/>
-
-    </VerticalStackLayout>
+        </VerticalStackLayout>
+    </ScrollView>
 </ContentPage>

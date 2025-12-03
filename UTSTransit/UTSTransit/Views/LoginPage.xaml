@@ -4,54 +4,87 @@
              xmlns:vm="clr-namespace:UTSTransit.ViewModels"
              x:Class="UTSTransit.Views.LoginPage"
              x:DataType="vm:LoginViewModel"
-             Title="登录 - UTS Transit">
+             Shell.NavBarIsVisible="False">
 
-    <ScrollView>
-        <VerticalStackLayout Spacing="25" Padding="30" VerticalOptions="Center">
+    <Grid>
+        <!-- Centered Content -->
+        <VerticalStackLayout VerticalOptions="Center" 
+                             HorizontalOptions="Center" 
+                             Spacing="24" 
+                             WidthRequest="320">
 
-            <Image Source="dotnet_bot.png"
-                   HeightRequest="150"
-                   HorizontalOptions="Center" />
+            <!-- Logo Area -->
+            <Image Source="dotnet_bot.png" 
+                   HeightRequest="64" 
+                   WidthRequest="64" 
+                   HorizontalOptions="Center"
+                   Margin="0,0,0,8"/>
 
-            <Label Text="Welcome to UTS Transit"
-                   FontSize="24"
-                   FontAttributes="Bold"
-                   HorizontalOptions="Center" />
+            <Label Text="Welcome back" 
+                   Style="{StaticResource HeaderLabel}" />
 
-            <Entry Placeholder="Email"
-                   Text="{Binding Email}"
-                   Keyboard="Email" />
+            <!-- Inputs -->
+            <VerticalStackLayout Spacing="12">
+                <Border Style="{StaticResource InputBorder}">
+                    <Entry Placeholder="Email address"
+                           Text="{Binding Email}"
+                           Keyboard="Email" />
+                </Border>
 
-            <Entry Placeholder="Password"
-                   Text="{Binding Password}"
-                   IsPassword="True" />
+                <Border Style="{StaticResource InputBorder}">
+                    <Entry Placeholder="Password"
+                           Text="{Binding Password}"
+                           IsPassword="True" />
+                </Border>
+            </VerticalStackLayout>
 
+            <!-- Error Message -->
             <Label Text="{Binding StatusMessage}"
-                   TextColor="Red"
-                   HorizontalOptions="Center" />
+                   TextColor="{StaticResource Error}"
+                   HorizontalOptions="Center"
+                   HorizontalTextAlignment="Center"
+                   FontSize="14">
+                <Label.Triggers>
+                    <DataTrigger TargetType="Label" Binding="{Binding StatusMessage}" Value="">
+                        <Setter Property="IsVisible" Value="False" />
+                    </DataTrigger>
+                    <DataTrigger TargetType="Label" Binding="{Binding StatusMessage}" Value="{x:Null}">
+                        <Setter Property="IsVisible" Value="False" />
+                    </DataTrigger>
+                </Label.Triggers>
+            </Label>
 
-            <ActivityIndicator IsRunning="{Binding IsBusy}"
-                               Color="{StaticResource Primary}" />
+            <!-- Actions -->
+            <VerticalStackLayout Spacing="16">
+                <Button Text="Continue"
+                        Command="{Binding LoginCommand}"
+                        IsEnabled="{Binding IsNotBusy}"/>
 
-            <Button Text="Login"
-                    Command="{Binding LoginCommand}"
-                    BackgroundColor="{StaticResource Primary}"
-                    TextColor="White"
-                    HeightRequest="50" />
+                <ActivityIndicator IsRunning="{Binding IsBusy}"
+                                   HorizontalOptions="Center" />
 
-            <Button Text="Register New Account"
-                    Command="{Binding GoToSignUpCommand}"
-                    BackgroundColor="Transparent"
-                    TextColor="{StaticResource Primary}"
-                    HeightRequest="50" />
-
-            <Button Text="Forgot Password?"
-                    Command="{Binding GoToForgotPasswordCommand}"
-                    BackgroundColor="Transparent"
-                    TextColor="Gray"
-                    FontSize="Small"
-                    HeightRequest="40" />
+                <Grid ColumnDefinitions="*, Auto" Margin="0,8,0,0">
+                    <Label Text="Don't have an account?" 
+                           TextColor="{StaticResource TextSecondary}"
+                           VerticalOptions="Center"
+                           FontSize="14"/>
+                    
+                    <Button Grid.Column="1"
+                            Text="Sign up"
+                            Command="{Binding GoToSignUpCommand}"
+                            Style="{StaticResource TextButton}"
+                            HorizontalOptions="End"
+                            Padding="0"
+                            HeightRequest="30"/>
+                </Grid>
+                
+                <Button Text="Forgot password?"
+                        Command="{Binding GoToForgotPasswordCommand}"
+                        Style="{StaticResource TextButton}"
+                        TextColor="{StaticResource TextSecondary}"
+                        FontSize="14"/>
+            </VerticalStackLayout>
 
         </VerticalStackLayout>
-    </ScrollView>
+    </Grid>
 </ContentPage>

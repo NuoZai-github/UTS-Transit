@@ -6,31 +6,35 @@
              x:DataType="vm:ProfileViewModel"
              Title="Profile">
 
-    <VerticalStackLayout Spacing="20" Padding="30" VerticalOptions="Center">
+    <ScrollView>
+        <VerticalStackLayout Spacing="20" Padding="30" VerticalOptions="Center">
 
-        <Image Source="dotnet_bot.png"
-               HeightRequest="120"
-               WidthRequest="120"
-               HorizontalOptions="Center" />
+            <Image Source="dotnet_bot.png"
+                   HeightRequest="100"
+                   WidthRequest="100"
+                   HorizontalOptions="Center" 
+                   Margin="0,0,0,10"/>
 
-        <Label Text="User Profile"
-               FontSize="24"
-               FontAttributes="Bold"
-               HorizontalOptions="Center" />
+            <Label Text="My Account"
+                   Style="{StaticResource TitleLabel}"
+                   HorizontalOptions="Center" />
 
-        <Frame Padding="20" BorderColor="LightGray" CornerRadius="10">
-            <VerticalStackLayout Spacing="10">
-                <Label Text="Email Address:" TextColor="Gray" FontSize="14" />
-                <Label Text="{Binding UserEmail}" FontSize="18" FontAttributes="Bold" TextColor="Black" />
-            </VerticalStackLayout>
-        </Frame>
+            <Border StrokeShape="RoundRectangle 8" Stroke="{AppThemeBinding Light={StaticResource Border}, Dark={StaticResource BorderDark}}" Padding="20" BackgroundColor="{AppThemeBinding Light={StaticResource PageBackground}, Dark={StaticResource SurfaceDark}}">
+                <VerticalStackLayout Spacing="5">
+                    <Label Text="Email Address" Style="{StaticResource SubtitleLabel}" />
+                    <Label Text="{Binding UserEmail}" FontSize="18" TextColor="{AppThemeBinding Light={StaticResource TextPrimary}, Dark={StaticResource TextPrimaryDark}}" />
+                </VerticalStackLayout>
+            </Border>
 
-        <Button Text="Logout"
-                Command="{Binding LogoutCommand}"
-                BackgroundColor="Red"
-                TextColor="White"
-                HeightRequest="50"
-                Margin="0,20,0,0" />
+            <Button Text="Sign out"
+                    Command="{Binding LogoutCommand}"
+                    BackgroundColor="Transparent"
+                    TextColor="{StaticResource Error}"
+                    BorderColor="{StaticResource Error}"
+                    BorderWidth="1"
+                    HeightRequest="50"
+                    Margin="0,20,0,0" />
 
-    </VerticalStackLayout>
+        </VerticalStackLayout>
+    </ScrollView>
 </ContentPage>

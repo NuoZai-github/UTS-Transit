@@ -2,8 +2,8 @@
 using System.Collections.ObjectModel;
 using UTSTransit.Models;
 using UTSTransit.Services;
-using Microsoft.Maui.Controls.Maps;
-using Microsoft.Maui.Maps;
+// using Microsoft.Maui.Controls.Maps; // Removed
+// using Microsoft.Maui.Maps; // Removed
 
 namespace UTSTransit.ViewModels
 {
@@ -13,7 +13,7 @@ namespace UTSTransit.ViewModels
         private readonly RouteService _routeService;
 
         // 存放地图上的大头针
-        public ObservableCollection<Pin> BusPins { get; } = new();
+        public ObservableCollection<BusPinModel> BusPins { get; } = new();
 
         // 存放路线信息
         public List<RouteInfo> Routes { get; private set; }
@@ -53,17 +53,24 @@ namespace UTSTransit.ViewModels
 
             if (existingPin != null)
             {
-                existingPin.Location = new Location(bus.Latitude, bus.Longitude);
+                existingPin.Latitude = bus.Latitude;
+                existingPin.Longitude = bus.Longitude;
                 existingPin.Address = $"Updated: {bus.LastUpdated.ToLocalTime():T}";
+                
+                // Trigger update manually if needed, or replace item to trigger CollectionChanged
+                // For simplicity, let's replace it or rely on property change if BusPinModel implemented INotifyPropertyChanged
+                // Since it doesn't, let's remove and add (simplest for now to trigger Map update)
+                var index = BusPins.IndexOf(existingPin);
+                BusPins[index] = existingPin; 
             }
             else
             {
-                var newPin = new Pin
+                var newPin = new BusPinModel
                 {
                     Label = bus.RouteName,
                     Address = $"Updated: {bus.LastUpdated.ToLocalTime():T}",
-                    Type = PinType.Place,
-                    Location = new Location(bus.Latitude, bus.Longitude)
+                    Latitude = bus.Latitude,
+                    Longitude = bus.Longitude
                 };
                 BusPins.Add(newPin);
             }

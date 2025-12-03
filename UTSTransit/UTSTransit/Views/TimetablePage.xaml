@@ -8,27 +8,27 @@
              Title="Schedule">
 
     <Grid RowDefinitions="Auto, *">
-        <Label Text="Bus Schedule"
-               FontSize="24"
-               FontAttributes="Bold"
-               Padding="20"
-               HorizontalOptions="Center" />
+        <Label Text="Departures"
+               Style="{StaticResource HeaderLabel}"
+               HorizontalOptions="Start"
+               Padding="24,24,24,12" />
 
-        <CollectionView Grid.Row="1" ItemsSource="{Binding Schedule}" Margin="10">
+        <CollectionView Grid.Row="1" ItemsSource="{Binding Schedule}" Margin="16,0">
             <CollectionView.ItemTemplate>
                 <DataTemplate x:DataType="models:TimetableItem">
-                    <Frame Margin="5" Padding="10" BorderColor="LightGray" CornerRadius="10">
-                        <Grid ColumnDefinitions="*, Auto, Auto">
-                            <VerticalStackLayout Grid.Column="0" Spacing="2">
-                                <Label Text="{Binding RouteName}" FontAttributes="Bold" FontSize="16" />
-                                <Label Text="{Binding DepartureTime}" TextColor="Gray" />
+                    <Frame Margin="0,6" Padding="16">
+                        <Grid ColumnDefinitions="*, Auto">
+                            <VerticalStackLayout Grid.Column="0" Spacing="4">
+                                <Label Text="{Binding RouteName}" FontAttributes="Bold" FontSize="16" TextColor="{StaticResource TextPrimary}"/>
+                                <Label Text="{Binding DepartureTime}" TextColor="{StaticResource TextSecondary}" FontSize="14"/>
                             </VerticalStackLayout>
                             
-                            <Label Grid.Column="2" 
+                            <Label Grid.Column="1" 
                                    Text="{Binding Status}" 
                                    TextColor="{Binding StatusColor}" 
                                    FontAttributes="Bold"
-                                   VerticalOptions="Center" />
+                                   VerticalOptions="Center" 
+                                   FontSize="14"/>
                         </Grid>
                     </Frame>
                 </DataTemplate>

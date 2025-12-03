@@ -2,6 +2,7 @@
 using UTSTransit.Services;
 using UTSTransit.ViewModels;
 using UTSTransit.Views;
+using SkiaSharp.Views.Maui.Controls.Hosting;
 
 namespace UTSTransit;
 
@@ -12,7 +13,8 @@ public static class MauiProgram
         var builder = MauiApp.CreateBuilder();
         builder
             .UseMauiApp<App>()
-            .UseMauiMaps() // <--- 关键：初始化地图组件
+            .UseSkiaSharp() // Register SkiaSharp handlers
+            //.UseMauiMaps()
             .ConfigureFonts(fonts =>
             {
                 fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
