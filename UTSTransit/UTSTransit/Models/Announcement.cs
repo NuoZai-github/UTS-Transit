@@ -1,10 +1,24 @@
+using Supabase.Postgrest.Attributes;
+using Supabase.Postgrest.Models;
+
 namespace UTSTransit.Models
 {
-    public class Announcement
+    [Table("announcements")]
+    public class Announcement : BaseModel
     {
+        [PrimaryKey("id")]
+        public Guid Id { get; set; }
+
+        [Column("title")]
         public string Title { get; set; } = string.Empty;
+
+        [Column("content")]
         public string Content { get; set; } = string.Empty;
-        public DateTime Date { get; set; }
-        public string DateString => Date.ToString("MMM dd, yyyy");
+
+        [Column("created_at")]
+        public DateTime CreatedAt { get; set; }
+
+        [Column("is_urgent")]
+        public bool IsUrgent { get; set; }
     }
 }

@@ -8,27 +8,67 @@
              Title="Schedule">
 
     <Grid RowDefinitions="Auto, *">
-        <Label Text="Departures"
-               Style="{StaticResource HeaderLabel}"
-               HorizontalOptions="Start"
-               Padding="24,24,24,12" />
+        <!-- Header with Date Selector (Mockup) -->
+        <VerticalStackLayout Padding="24,24,24,12" Spacing="16" BackgroundColor="{StaticResource Surface}">
+            <Label Text="Bus Schedule" Style="{StaticResource HeaderLabel}"/>
+            
+            <!-- Date Chips (Horizontal Scroll) -->
+            <ScrollView Orientation="Horizontal" HorizontalScrollBarVisibility="Never">
+                <HorizontalStackLayout Spacing="12">
+                    <Border StrokeShape="RoundRectangle 20" BackgroundColor="{StaticResource Primary}" Padding="16,8" StrokeThickness="0">
+                        <Label Text="Today" TextColor="White" FontAttributes="Bold"/>
+                    </Border>
+                    <Border StrokeShape="RoundRectangle 20" BackgroundColor="{StaticResource PageBackground}" Padding="16,8" StrokeThickness="0">
+                        <Label Text="Tomorrow" TextColor="{StaticResource TextSecondary}"/>
+                    </Border>
+                    <Border StrokeShape="RoundRectangle 20" BackgroundColor="{StaticResource PageBackground}" Padding="16,8" StrokeThickness="0">
+                        <Label Text="Weekend" TextColor="{StaticResource TextSecondary}"/>
+                    </Border>
+                </HorizontalStackLayout>
+            </ScrollView>
+        </VerticalStackLayout>
 
-        <CollectionView Grid.Row="1" ItemsSource="{Binding Schedule}" Margin="16,0">
+        <!-- Schedule List -->
+        <CollectionView Grid.Row="1" ItemsSource="{Binding Schedule}" Margin="16">
             <CollectionView.ItemTemplate>
                 <DataTemplate x:DataType="models:TimetableItem">
-                    <Frame Margin="0,6" Padding="16">
-                        <Grid ColumnDefinitions="*, Auto">
-                            <VerticalStackLayout Grid.Column="0" Spacing="4">
-                                <Label Text="{Binding RouteName}" FontAttributes="Bold" FontSize="16" TextColor="{StaticResource TextPrimary}"/>
-                                <Label Text="{Binding DepartureTime}" TextColor="{StaticResource TextSecondary}" FontSize="14"/>
+                    <Frame Margin="0,6" Padding="0" CornerRadius="16">
+                        <Grid ColumnDefinitions="80, *, Auto" Padding="16">
+                            <!-- Time Column -->
+                            <VerticalStackLayout VerticalOptions="Center">
+                                <Label Text="{Binding DepartureTime}" 
+                                       FontSize="18" 
+                                       FontAttributes="Bold" 
+                                       TextColor="{StaticResource Primary}"/>
+                                <Label Text="Departs" 
+                                       FontSize="12" 
+                                       TextColor="{StaticResource TextSecondary}"/>
+                            </VerticalStackLayout>
+
+                            <!-- Route Info -->
+                            <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Padding="16,0">
+                                <Label Text="{Binding RouteName}" 
+                                       FontAttributes="Bold" 
+                                       FontSize="16" 
+                                       TextColor="{StaticResource TextPrimary}"
+                                       LineBreakMode="TailTruncation"/>
+                                <Label Text="To Campus" 
+                                       FontSize="13" 
+                                       TextColor="{StaticResource TextSecondary}"/>
                             </VerticalStackLayout>
                             
-                            <Label Grid.Column="1" 
-                                   Text="{Binding Status}" 
-                                   TextColor="{Binding StatusColor}" 
-                                   FontAttributes="Bold"
-                                   VerticalOptions="Center" 
-                                   FontSize="14"/>
+                            <!-- Status Badge -->
+                            <Border Grid.Column="2" 
+                                    StrokeShape="RoundRectangle 8" 
+                                    BackgroundColor="{StaticResource PageBackground}" 
+                                    StrokeThickness="0"
+                                    Padding="8,4"
+                                    VerticalOptions="Center">
+                                <Label Text="{Binding Status}" 
+                                       TextColor="{Binding StatusColor}" 
+                                       FontAttributes="Bold"
+                                       FontSize="12"/>
+                            </Border>
                         </Grid>
                     </Frame>
                 </DataTemplate>

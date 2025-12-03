@@ -21,6 +21,14 @@ public static class MauiProgram
                 fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
             });
 
+        // Remove Entry Underline on Android
+        Microsoft.Maui.Handlers.EntryHandler.Mapper.AppendToMapping("NoUnderline", (h, v) =>
+        {
+#if ANDROID
+            h.PlatformView.BackgroundTintList = Android.Content.Res.ColorStateList.ValueOf(Android.Graphics.Color.Transparent);
+#endif
+        });
+
         // 1. 注册核心服务 (单例模式)
         builder.Services.AddSingleton<TransitService>();
         builder.Services.AddSingleton<RouteService>();
@@ -35,6 +43,7 @@ public static class MauiProgram
         builder.Services.AddTransient<AnnouncementsPage>();
         builder.Services.AddTransient<ProfilePage>();
         builder.Services.AddTransient<HomePage>();
+        builder.Services.AddTransient<AdminDashboardPage>();
 
         // 3. 注册 ViewModels
         builder.Services.AddTransient<LoginViewModel>();
@@ -46,6 +55,7 @@ public static class MauiProgram
         builder.Services.AddTransient<AnnouncementsViewModel>();
         builder.Services.AddTransient<ProfileViewModel>();
         builder.Services.AddTransient<HomePageViewModel>();
+        builder.Services.AddTransient<AdminDashboardViewModel>();
 
 #if DEBUG
         builder.Logging.AddDebug();

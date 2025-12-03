@@ -15,23 +15,24 @@
 
             <!-- Logo Area -->
             <Image Source="dotnet_bot.png" 
-                   HeightRequest="64" 
-                   WidthRequest="64" 
+                   HeightRequest="120" 
+                   WidthRequest="120" 
                    HorizontalOptions="Center"
-                   Margin="0,0,0,8"/>
+                   Margin="0,0,0,16"/>
 
             <Label Text="Welcome back" 
-                   Style="{StaticResource HeaderLabel}" />
+                   Style="{StaticResource HeaderLabel}" 
+                   HorizontalOptions="Center"/>
 
             <!-- Inputs -->
             <VerticalStackLayout Spacing="12">
-                <Border Style="{StaticResource InputBorder}">
+                <Border Style="{StaticResource InputContainer}">
                     <Entry Placeholder="Email address"
                            Text="{Binding Email}"
                            Keyboard="Email" />
                 </Border>
 
-                <Border Style="{StaticResource InputBorder}">
+                <Border Style="{StaticResource InputContainer}">
                     <Entry Placeholder="Password"
                            Text="{Binding Password}"
                            IsPassword="True" />
@@ -63,26 +64,24 @@
                 <ActivityIndicator IsRunning="{Binding IsBusy}"
                                    HorizontalOptions="Center" />
 
-                <Grid ColumnDefinitions="*, Auto" Margin="0,8,0,0">
+                <HorizontalStackLayout HorizontalOptions="Center" Spacing="4" Margin="0,8,0,0">
                     <Label Text="Don't have an account?" 
                            TextColor="{StaticResource TextSecondary}"
                            VerticalOptions="Center"
                            FontSize="14"/>
                     
-                    <Button Grid.Column="1"
-                            Text="Sign up"
+                    <Button Text="Sign up"
                             Command="{Binding GoToSignUpCommand}"
                             Style="{StaticResource TextButton}"
-                            HorizontalOptions="End"
-                            Padding="0"
-                            HeightRequest="30"/>
-                </Grid>
+                            VerticalOptions="Center"/>
+                </HorizontalStackLayout>
                 
                 <Button Text="Forgot password?"
                         Command="{Binding GoToForgotPasswordCommand}"
                         Style="{StaticResource TextButton}"
                         TextColor="{StaticResource TextSecondary}"
-                        FontSize="14"/>
+                        FontSize="14"
+                        HorizontalOptions="Center"/>
             </VerticalStackLayout>
 
         </VerticalStackLayout>

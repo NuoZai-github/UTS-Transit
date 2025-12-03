@@ -4,48 +4,42 @@
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml">
 
-    <!-- Modern Palette -->
+    <!-- UTS Transit Modern Palette -->
     
-    <!-- Brand Colors -->
-    <Color x:Key="Primary">#10A37F</Color> <!-- ChatGPT Teal -->
-    <Color x:Key="PrimaryDark">#0D8C6D</Color>
-    <Color x:Key="Secondary">#F7F7F8</Color>
+    <!-- Brand Colors (UTS Blue & Accents) -->
+    <Color x:Key="Primary">#00549E</Color> <!-- UTS Deep Blue -->
+    <Color x:Key="PrimaryDark">#003E75</Color>
+    <Color x:Key="PrimaryLight">#E6F0FA</Color>
     
+    <!-- Accent Colors (High Visibility) -->
+    <Color x:Key="Accent">#FF6B00</Color> <!-- Vibrant Orange for CTAs/Live Data -->
+    <Color x:Key="AccentDark">#CC5500</Color>
+    
+    <!-- Status Colors -->
+    <Color x:Key="Success">#10B981</Color> <!-- Modern Green -->
+    <Color x:Key="Warning">#F59E0B</Color> <!-- Amber -->
+    <Color x:Key="Error">#EF4444</Color>   <!-- Red -->
+    <Color x:Key="Info">#3B82F6</Color>    <!-- Blue -->
+
     <!-- Backgrounds -->
-    <Color x:Key="PageBackground">#FFFFFF</Color>
-    <Color x:Key="PageBackgroundDark">#343541</Color>
+    <Color x:Key="PageBackground">#F8FAFC</Color> <!-- Very light blue-gray -->
+    <Color x:Key="PageBackgroundDark">#0F172A</Color> <!-- Slate 900 -->
     <Color x:Key="Surface">#FFFFFF</Color>
-    <Color x:Key="SurfaceDark">#444654</Color>
-    <Color x:Key="InputBackground">#FFFFFF</Color>
-    <Color x:Key="InputBackgroundDark">#40414F</Color>
-
+    <Color x:Key="SurfaceDark">#1E293B</Color> <!-- Slate 800 -->
+    
     <!-- Text -->
-    <Color x:Key="TextPrimary">#202123</Color>
-    <Color x:Key="TextPrimaryDark">#ECECF1</Color>
-    <Color x:Key="TextSecondary">#6E6E80</Color>
-    <Color x:Key="TextSecondaryDark">#C5C5D2</Color>
-    <Color x:Key="TextPlaceholder">#8E8EA0</Color>
+    <Color x:Key="TextPrimary">#1E293B</Color> <!-- Slate 800 -->
+    <Color x:Key="TextPrimaryDark">#F1F5F9</Color> <!-- Slate 100 -->
+    <Color x:Key="TextSecondary">#64748B</Color> <!-- Slate 500 -->
+    <Color x:Key="TextSecondaryDark">#94A3B8</Color> <!-- Slate 400 -->
+    <Color x:Key="TextInverse">#FFFFFF</Color>
 
-    <!-- Borders -->
-    <Color x:Key="Border">#C5C5D2</Color>
-    <Color x:Key="BorderDark">#565869</Color>
-    <Color x:Key="BorderFocus">#10A37F</Color>
+    <!-- Borders & Dividers -->
+    <Color x:Key="Border">#E2E8F0</Color> <!-- Slate 200 -->
+    <Color x:Key="BorderDark">#334155</Color> <!-- Slate 700 -->
 
-    <!-- Status -->
-    <Color x:Key="Error">#EF4444</Color>
-    <Color x:Key="Success">#10A37F</Color>
-    <Color x:Key="Warning">#EAB308</Color>
-
-    <!-- Legacy (Keep for compatibility) -->
-    <Color x:Key="White">#FFFFFF</Color>
-    <Color x:Key="Black">#000000</Color>
-    <Color x:Key="Gray100">#F7F7F8</Color>
-    <Color x:Key="Gray200">#ECECF1</Color>
-    <Color x:Key="Gray300">#D9D9E3</Color>
-    <Color x:Key="Gray400">#ACACBE</Color>
-    <Color x:Key="Gray500">#8E8EA0</Color>
-    <Color x:Key="Gray600">#565869</Color>
-    <Color x:Key="Gray900">#202123</Color>
-
+    <!-- Brushes -->
     <SolidColorBrush x:Key="PrimaryBrush" Color="{StaticResource Primary}"/>
+    <SolidColorBrush x:Key="AccentBrush" Color="{StaticResource Accent}"/>
+    <SolidColorBrush x:Key="PageBackgroundBrush" Color="{StaticResource PageBackground}"/>
 </ResourceDictionary>

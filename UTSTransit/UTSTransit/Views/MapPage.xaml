@@ -4,21 +4,71 @@
              xmlns:mapsui="clr-namespace:Mapsui.UI.Maui;assembly=Mapsui.UI.Maui"
              xmlns:vm="clr-namespace:UTSTransit.ViewModels"
              x:Class="UTSTransit.Views.MapPage"
-             Title="Live Map (OSM)">
+             x:DataType="vm:MapViewModel"
+             Title="Live Map">
 
     <Grid>
-        <!-- Mapsui Control -->
+        <!-- Full Screen Map -->
         <mapsui:MapView x:Name="BusMap" 
-                        IsMyLocationButtonVisible="True"
-                        IsNorthingButtonVisible="True" 
-                        IsZoomButtonVisible="True" />
+                        VerticalOptions="FillAndExpand" 
+                        HorizontalOptions="FillAndExpand" />
 
-        <VerticalStackLayout VerticalOptions="End" Margin="20">
-            <Label Text="Listening for bus locations..." 
-                   BackgroundColor="White" 
-                   Padding="10"
-                   HorizontalOptions="Center"
-                   TextColor="Black"/>
-        </VerticalStackLayout>
+        <!-- Floating Bottom Sheet (Card) -->
+        <Frame VerticalOptions="End" 
+               Margin="16,0,16,24" 
+               CornerRadius="20" 
+               HasShadow="True" 
+               Padding="0"
+               BackgroundColor="{StaticResource Surface}">
+            
+            <Grid RowDefinitions="Auto, Auto" Padding="20">
+                <!-- Drag Handle -->
+                <BoxView HeightRequest="4" 
+                         WidthRequest="40" 
+                         Color="{StaticResource Border}" 
+                         CornerRadius="2" 
+                         HorizontalOptions="Center" 
+                         Margin="0,0,0,16"/>
+
+                <!-- Content -->
+                <VerticalStackLayout Grid.Row="1" Spacing="16">
+                    <Label Text="Next Bus to Campus" 
+                           Style="{StaticResource CardSubtitleLabel}"/>
+                    
+                    <Grid ColumnDefinitions="*, Auto">
+                        <VerticalStackLayout>
+                            <Label Text="Route A" 
+                                   FontSize="20" 
+                                   FontAttributes="Bold" 
+                                   TextColor="{StaticResource Primary}"/>
+                            <Label Text="Arriving in 5 mins" 
+                                   TextColor="{StaticResource Success}" 
+                                   FontAttributes="Bold"/>
+                        </VerticalStackLayout>
+                        
+                        <Button Grid.Column="1" 
+                                Text="Details" 
+                                Style="{StaticResource GhostButton}" 
+                                Padding="0"
+                                HorizontalOptions="End"/>
+                    </Grid>
+
+                    <Button Text="Find Route" 
+                            Style="{StaticResource AccentButton}"/>
+                </VerticalStackLayout>
+            </Grid>
+        </Frame>
+
+        <!-- Search Bar (Floating Top) -->
+        <Frame VerticalOptions="Start" 
+               Margin="16,16,16,0" 
+               CornerRadius="24" 
+               Padding="0" 
+               HasShadow="True"
+               HeightRequest="50">
+            <SearchBar Placeholder="Search destination..." 
+                       BackgroundColor="Transparent" 
+                       TextColor="{StaticResource TextPrimary}"/>
+        </Frame>
     </Grid>
 </ContentPage>

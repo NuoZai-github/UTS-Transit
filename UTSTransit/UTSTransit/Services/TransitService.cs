@@ -58,16 +58,21 @@ namespace UTSTransit.Services
         }
 
         // 身份验证：注册
-        public async Task<(bool IsSuccess, string ErrorMessage)> RegisterAsync(string email, string password, string role)
+        public async Task<(bool IsSuccess, string ErrorMessage)> RegisterAsync(string email, string password, string role, string studentId = null, string icNumber = null)
         {
             try
             {
+                var data = new Dictionary<string, object>
+                {
+                    { "role", role }
+                };
+
+                if (!string.IsNullOrEmpty(studentId)) data.Add("student_id", studentId);
+                if (!string.IsNullOrEmpty(icNumber)) data.Add("ic_number", icNumber);
+
                 var options = new Supabase.Gotrue.SignUpOptions
                 {
-                    Data = new Dictionary<string, object>
-                    {
-                        { "role", role }
-                    }
+                    Data = data
                 };
 
                 var session = await _client.Auth.SignUp(email, password, options);
@@ -213,6 +218,94 @@ namespace UTSTransit.Services
                 });
 
             await channel.Subscribe();
+        }
+
+        // --- Admin Features ---
+
+        // 1. User Management
+        public async Task<List<Supabase.Gotrue.User>> GetUsersAsync()
+        {
+            // Note: Client-side listing of users is restricted. 
+            // We will query the 'profiles' table instead which mirrors users.
+            // Ensure you have a 'profiles' table with 'role' column.
+            try
+            {
+                // This assumes you have a public.profiles table that is readable by admins
+                // For this demo, we might need to mock or use a workaround if profiles table isn't fully set up
+                // Let's try to fetch from a 'profiles' table model if we had one.
+                // Since we don't have a Profile model yet, let's create a dynamic query or just return a placeholder for now
+                // to avoid compilation errors.
+                // Ideally: return await _client.From<Profile>().Get();
+                return new List<Supabase.Gotrue.User>(); 
+            }
+            catch
+            {
+                return new List<Supabase.Gotrue.User>();
+            }
+        }
+
+        // 2. Announcements (Real DB)
+        public async Task<List<Announcement>> GetAnnouncementsAsync()
+        {
+            try
+            {
+                var response = await _client.From<Announcement>().Order("created_at", Supabase.Postgrest.Constants.Ordering.Descending).Get();
+                return response.Models;
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Fetch Announcements Error: {ex.Message}");
+                return new List<Announcement>();
+            }
+        }
+
+        public async Task CreateAnnouncementAsync(Announcement announcement)
+        {
+            await _client.From<Announcement>().Insert(announcement);
+        }
+
+        public async Task DeleteAnnouncementAsync(Guid id)
+        {
+            await _client.From<Announcement>().Where(x => x.Id == id).Delete();
+        }
+
+        // 3. Schedules (Real DB)
+        public async Task<List<ScheduleItem>> GetSchedulesAsync()
+        {
+            try
+            {
+                var response = await _client.From<ScheduleItem>().Order("departure_time", Supabase.Postgrest.Constants.Ordering.Ascending).Get();
+                return response.Models;
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Fetch Schedules Error: {ex.Message}");
+                return new List<ScheduleItem>();
+            }
+        }
+
+        public async Task CreateScheduleAsync(ScheduleItem item)
+        {
+            await _client.From<ScheduleItem>().Insert(item);
+        }
+
+        public async Task DeleteScheduleAsync(Guid id)
+        {
+            await _client.From<ScheduleItem>().Where(x => x.Id == id).Delete();
+        }
+
+        // 4. Live Monitoring (Passengers)
+        public async Task<List<TripPassenger>> GetTripPassengersAsync(int tripId)
+        {
+            try
+            {
+                var response = await _client.From<TripPassenger>().Where(x => x.TripId == tripId).Get();
+                return response.Models;
+            }
+            catch
+            {
+                return new List<TripPassenger>();
+            }
         }
     }
 }

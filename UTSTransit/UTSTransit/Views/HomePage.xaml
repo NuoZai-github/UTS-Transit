@@ -6,78 +6,104 @@
              x:DataType="vm:HomePageViewModel"
              Title="Home">
 
-    <Grid RowDefinitions="Auto, *, Auto" Padding="24">
+    <Grid RowDefinitions="Auto, *, Auto" Padding="24" RowSpacing="20">
         
-        <!-- Header -->
+        <!-- Header Section -->
         <Grid ColumnDefinitions="*, Auto">
             <VerticalStackLayout Spacing="4">
-                <Label Text="UTS Transit" 
-                       FontSize="20" 
-                       FontAttributes="Bold"
-                       TextColor="{StaticResource TextPrimary}"/>
-                <Label Text="Live Status" 
-                       FontSize="14" 
-                       TextColor="{StaticResource TextSecondary}"/>
-            </VerticalStackLayout>
-            
-            <!-- Status Indicator Dot -->
-            <BoxView Grid.Column="1" 
-                     HeightRequest="12" 
-                     WidthRequest="12" 
-                     CornerRadius="6" 
-                     Color="{StaticResource Success}" 
-                     VerticalOptions="Center"/>
-        </Grid>
-
-        <!-- Animation Area -->
-        <Grid Grid.Row="1" VerticalOptions="Center">
-            <!-- Road Line -->
-            <BoxView HeightRequest="1" Color="{StaticResource Border}" VerticalOptions="Center" />
-            
-            <!-- Bus Image -->
-            <Image x:Name="BusImage" 
-                   Source="bus_side.png" 
-                   HeightRequest="60" 
-                   WidthRequest="100" 
-                   HorizontalOptions="Start" 
-                   VerticalOptions="Center"
-                   TranslationY="-15"/>
-            
-            <!-- Stop Sign -->
-            <Image x:Name="StopSign"
-                   Source="stop_sign.png"
-                   HeightRequest="60"
-                   WidthRequest="60"
-                   HorizontalOptions="Center"
-                   VerticalOptions="Center"
-                   IsVisible="False"/>
-            
-            <!-- Zzz Text -->
-            <Label x:Name="ZzzText"
-                   Text="Zzz..."
-                   FontSize="24"
-                   TextColor="{StaticResource Primary}"
-                   HorizontalOptions="Center"
-                   VerticalOptions="Start"
-                   TranslationY="-50"
-                   IsVisible="False"/>
-        </Grid>
-
-        <!-- Status Card -->
-        <Frame Grid.Row="2" Margin="0,0,0,20">
-            <VerticalStackLayout Spacing="8">
-                <Label Text="{Binding StatusText}" 
+                <Label Text="Good Morning," 
                        FontSize="16" 
-                       HorizontalOptions="Center" 
-                       HorizontalTextAlignment="Center"
-                       TextColor="{StaticResource TextPrimary}"
-                       FontAttributes="Bold"/>
-                
-                <Label Text="{Binding LastUpdatedText}" 
-                       FontSize="12" 
-                       TextColor="{StaticResource TextSecondary}" 
-                       HorizontalOptions="Center"/>
+                       TextColor="{StaticResource TextSecondary}"/>
+                <Label Text="Student" 
+                       Style="{StaticResource HeaderLabel}"/>
             </VerticalStackLayout>
+            
+            <!-- Profile/Settings Icon Placeholder -->
+            <Border Grid.Column="1" 
+                    StrokeShape="RoundRectangle 20" 
+                    HeightRequest="40" 
+                    WidthRequest="40" 
+                    StrokeThickness="0"
+                    BackgroundColor="{StaticResource PrimaryLight}"
+                    VerticalOptions="Start">
+                <Label Text="👤" 
+                       HorizontalOptions="Center" 
+                       VerticalOptions="Center"
+                       TextColor="{StaticResource Primary}"/>
+            </Border>
+        </Grid>
+
+        <!-- Main Status Card (Floating Effect) -->
+        <Frame Grid.Row="1" VerticalOptions="Center" CornerRadius="24" HasShadow="True" Padding="0">
+            <Grid RowDefinitions="200, Auto">
+                <!-- Animation Background -->
+                <Grid BackgroundColor="{StaticResource PrimaryLight}">
+                    <!-- Road -->
+                    <BoxView HeightRequest="2" Color="{StaticResource Border}" VerticalOptions="Center" />
+                    
+                    <!-- Bus -->
+                    <Image x:Name="BusImage" 
+                           Source="bus_side.png" 
+                           HeightRequest="80" 
+                           WidthRequest="120" 
+                           HorizontalOptions="Start" 
+                           VerticalOptions="Center"
+                           TranslationY="-10"/>
+                    
+                    <!-- Stop Sign -->
+                    <Image x:Name="StopSign"
+                           Source="stop_sign.png"
+                           HeightRequest="60"
+                           WidthRequest="60"
+                           HorizontalOptions="Center"
+                           VerticalOptions="Center"
+                           IsVisible="False"/>
+                    
+                    <!-- Zzz -->
+                    <Label x:Name="ZzzText"
+                           Text="Zzz..."
+                           FontSize="32"
+                           FontAttributes="Bold"
+                           TextColor="{StaticResource Primary}"
+                           HorizontalOptions="Center"
+                           VerticalOptions="Start"
+                           TranslationY="-60"
+                           IsVisible="False"/>
+                </Grid>
+
+                <!-- Status Info -->
+                <VerticalStackLayout Grid.Row="1" Padding="24" Spacing="8" BackgroundColor="{StaticResource Surface}">
+                    <Label Text="Current Status" 
+                           Style="{StaticResource CardSubtitleLabel}" 
+                           HorizontalOptions="Center"/>
+                    
+                    <Label Text="{Binding StatusText}" 
+                           FontSize="20" 
+                           FontAttributes="Bold"
+                           HorizontalOptions="Center" 
+                           HorizontalTextAlignment="Center"
+                           TextColor="{StaticResource Primary}"/>
+                    
+                    <Label Text="{Binding LastUpdatedText}" 
+                           FontSize="12" 
+                           TextColor="{StaticResource TextSecondary}" 
+                           HorizontalOptions="Center"/>
+                </VerticalStackLayout>
+            </Grid>
         </Frame>
+
+        <!-- Quick Actions -->
+        <Grid Grid.Row="2" ColumnDefinitions="*, *" ColumnSpacing="16">
+            <Button Text="View Map" 
+                    Style="{StaticResource AccentButton}"
+                    ImageSource="map_icon.png"/> <!-- Placeholder icon -->
+            
+            <Button Grid.Column="1" 
+                    Text="Schedule" 
+                    BackgroundColor="{StaticResource Surface}"
+                    TextColor="{StaticResource Primary}"
+                    BorderColor="{StaticResource Primary}"
+                    BorderWidth="1"/>
+        </Grid>
     </Grid>
 </ContentPage>

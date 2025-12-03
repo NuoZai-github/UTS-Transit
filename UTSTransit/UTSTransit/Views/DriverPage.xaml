@@ -6,49 +6,70 @@
              x:DataType="vm:DriverViewModel"
              Title="Driver Console">
 
-    <ScrollView>
-        <VerticalStackLayout Spacing="24" Padding="24" VerticalOptions="Center">
-
+    <Grid RowDefinitions="Auto, *">
+        <!-- Header -->
+        <VerticalStackLayout Padding="24" BackgroundColor="{StaticResource Primary}">
             <Label Text="Driver Console" 
-                   Style="{StaticResource HeaderLabel}" />
-
-            <VerticalStackLayout Spacing="8">
-                <Label Text="Select Route" Style="{StaticResource SubHeaderLabel}" HorizontalOptions="Start"/>
-                <Border Style="{StaticResource InputBorder}">
-                    <Picker SelectedItem="{Binding SelectedRoute}" Title="Select a route">
-                        <Picker.ItemsSource>
-                            <x:Array Type="{x:Type x:String}">
-                                <x:String>Route A (Dorm -> Campus)</x:String>
-                                <x:String>Route B (Campus -> Hostel)</x:String>
-                                <x:String>Weekend Special</x:String>
-                            </x:Array>
-                        </Picker.ItemsSource>
-                    </Picker>
-                </Border>
-            </VerticalStackLayout>
-
-            <VerticalStackLayout Spacing="8">
-                <Label Text="Current Status" Style="{StaticResource SubHeaderLabel}" HorizontalOptions="Start"/>
-                <Border Style="{StaticResource InputBorder}">
-                    <Picker ItemsSource="{Binding StatusOptions}" 
-                            SelectedItem="{Binding SelectedStatus}"
-                            Title="Select status"/>
-                </Border>
-            </VerticalStackLayout>
-
-            <Label Text="{Binding StatusMessage}" 
-                   TextColor="{StaticResource Primary}"
-                   HorizontalOptions="Center" 
-                   HorizontalTextAlignment="Center"
-                   FontAttributes="Bold"/>
-
-            <ActivityIndicator IsRunning="{Binding IsBusy}" 
-                               HorizontalOptions="Center" />
-
-            <Button Text="Start / Stop Trip"
-                    Command="{Binding ToggleSharingCommand}"
-                    Margin="0,16,0,0"/>
-
+                   Style="{StaticResource HeaderLabel}" 
+                   TextColor="White"/>
+            <Label Text="Manage your trip status" 
+                   TextColor="{StaticResource PrimaryLight}"
+                   FontSize="14"/>
         </VerticalStackLayout>
-    </ScrollView>
+
+        <ScrollView Grid.Row="1">
+            <VerticalStackLayout Spacing="24" Padding="24">
+
+                <!-- Route Selection Card -->
+                <Frame>
+                    <VerticalStackLayout Spacing="12">
+                        <Label Text="Select Route" Style="{StaticResource CardTitleLabel}"/>
+                        <Border Style="{StaticResource InputContainer}">
+                            <Picker SelectedItem="{Binding SelectedRoute}" Title="Select a route">
+                                <Picker.ItemsSource>
+                                    <x:Array Type="{x:Type x:String}">
+                                        <x:String>Route A (Dorm -> Campus)</x:String>
+                                        <x:String>Route B (Campus -> Hostel)</x:String>
+                                        <x:String>Weekend Special</x:String>
+                                    </x:Array>
+                                </Picker.ItemsSource>
+                            </Picker>
+                        </Border>
+                    </VerticalStackLayout>
+                </Frame>
+
+                <!-- Status Selection Card -->
+                <Frame>
+                    <VerticalStackLayout Spacing="12">
+                        <Label Text="Current Status" Style="{StaticResource CardTitleLabel}"/>
+                        <Border Style="{StaticResource InputContainer}">
+                            <Picker ItemsSource="{Binding StatusOptions}" 
+                                    SelectedItem="{Binding SelectedStatus}"
+                                    Title="Select status"/>
+                        </Border>
+                    </VerticalStackLayout>
+                </Frame>
+
+                <!-- Status Message -->
+                <Label Text="{Binding StatusMessage}" 
+                       TextColor="{StaticResource Accent}"
+                       HorizontalOptions="Center" 
+                       HorizontalTextAlignment="Center"
+                       FontAttributes="Bold"
+                       FontSize="16"/>
+
+                <ActivityIndicator IsRunning="{Binding IsBusy}" 
+                                   HorizontalOptions="Center" />
+
+                <!-- Big Action Button -->
+                <Button Text="Start / Stop Trip"
+                        Command="{Binding ToggleSharingCommand}"
+                        Style="{StaticResource AccentButton}"
+                        HeightRequest="60"
+                        FontSize="18"
+                        Margin="0,16,0,0"/>
+
+            </VerticalStackLayout>
+        </ScrollView>
+    </Grid>
 </ContentPage>

@@ -7,6 +7,7 @@
             InitializeComponent();
             Routing.RegisterRoute("SignUpPage", typeof(Views.SignUpPage));
             Routing.RegisterRoute("ForgotPasswordPage", typeof(Views.ForgotPasswordPage));
+            Routing.RegisterRoute("AdminDashboardPage", typeof(Views.AdminDashboardPage));
         }
 
         public void SetDriverTabVisible(bool isVisible)

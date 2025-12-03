@@ -31,9 +31,27 @@
                 <Switch IsToggled="{Binding IsDriver}" />
             </HorizontalStackLayout>
 
-            <Entry Placeholder="Driver Verification Code (Required for Drivers)"
-                   Text="{Binding VerificationCode}"
-                   IsVisible="{Binding IsDriver}" />
+            <!-- Student ID: Visible only when NOT a driver -->
+            <Entry Placeholder="Student ID"
+                   Text="{Binding StudentId}">
+                <Entry.Triggers>
+                    <DataTrigger TargetType="Entry" Binding="{Binding IsDriver}" Value="True">
+                        <Setter Property="IsVisible" Value="False" />
+                    </DataTrigger>
+                    <DataTrigger TargetType="Entry" Binding="{Binding IsDriver}" Value="False">
+                        <Setter Property="IsVisible" Value="True" />
+                    </DataTrigger>
+                </Entry.Triggers>
+            </Entry>
+
+            <!-- Driver Fields: Visible only when IS a driver -->
+            <VerticalStackLayout Spacing="25" IsVisible="{Binding IsDriver}">
+                <Entry Placeholder="IC Number"
+                       Text="{Binding IcNumber}" />
+                
+                <Entry Placeholder="Driver Verification Code (Required)"
+                       Text="{Binding VerificationCode}" />
+            </VerticalStackLayout>
 
             <Label Text="{Binding StatusMessage}"
                    TextColor="Red"

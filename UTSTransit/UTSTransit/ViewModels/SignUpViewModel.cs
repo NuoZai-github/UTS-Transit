@@ -22,6 +22,12 @@ namespace UTSTransit.ViewModels
         private bool _isDriver;
 
         [ObservableProperty]
+        private string _studentId = string.Empty;
+
+        [ObservableProperty]
+        private string _icNumber = string.Empty;
+
+        [ObservableProperty]
         private string _verificationCode = string.Empty;
 
         [ObservableProperty]
@@ -62,7 +68,20 @@ namespace UTSTransit.ViewModels
                     StatusMessage = "Invalid Verification Code. Please contact lime6199@gmail.com.";
                     return;
                 }
+                if (string.IsNullOrWhiteSpace(IcNumber))
+                {
+                    StatusMessage = "Please enter your IC Number.";
+                    return;
+                }
                 role = "driver";
+            }
+            else
+            {
+                if (string.IsNullOrWhiteSpace(StudentId))
+                {
+                    StatusMessage = "Please enter your Student ID.";
+                    return;
+                }
             }
 
             IsBusy = true;
@@ -71,7 +90,7 @@ namespace UTSTransit.ViewModels
             try
             {
                 await _transitService.InitializeAsync();
-                var result = await _transitService.RegisterAsync(Email, Password, role);
+                var result = await _transitService.RegisterAsync(Email, Password, role, StudentId, IcNumber);
 
                 if (result.IsSuccess)
                 {
