@@ -20,5 +20,7 @@ namespace UTSTransit.Models
 
         [Column("is_urgent")]
         public bool IsUrgent { get; set; }
+
+        public string DateString => CreatedAt.ToString("MMM dd, yyyy");
     }
 }

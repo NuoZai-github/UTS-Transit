@@ -43,7 +43,6 @@ public static class MauiProgram
         builder.Services.AddTransient<AnnouncementsPage>();
         builder.Services.AddTransient<ProfilePage>();
         builder.Services.AddTransient<HomePage>();
-        builder.Services.AddTransient<AdminDashboardPage>();
 
         // 3. 注册 ViewModels
         builder.Services.AddTransient<LoginViewModel>();
@@ -55,7 +54,6 @@ public static class MauiProgram
         builder.Services.AddTransient<AnnouncementsViewModel>();
         builder.Services.AddTransient<ProfileViewModel>();
         builder.Services.AddTransient<HomePageViewModel>();
-        builder.Services.AddTransient<AdminDashboardViewModel>();
 
 #if DEBUG
         builder.Logging.AddDebug();

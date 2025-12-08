@@ -148,19 +148,19 @@ namespace UTSTransit.Services
                 {
                     Title = "Heavy Rain Warning",
                     Content = "Due to heavy rain, buses on Route B may be delayed by 10-15 minutes.",
-                    Date = DateTime.Now
+                    CreatedAt = DateTime.Now
                 },
                 new Models.Announcement
                 {
                     Title = "Exam Week Schedule",
                     Content = "During exam week, we will be adding extra buses on Route A between 8 AM and 10 AM.",
-                    Date = DateTime.Now.AddDays(-2)
+                    CreatedAt = DateTime.Now.AddDays(-2)
                 },
                 new Models.Announcement
                 {
                     Title = "App Maintenance",
                     Content = "The UTS Transit app will undergo maintenance this Sunday from 2 AM to 4 AM.",
-                    Date = DateTime.Now.AddDays(-5)
+                    CreatedAt = DateTime.Now.AddDays(-5)
                 }
             };
         }
