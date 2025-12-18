@@ -284,6 +284,83 @@ namespace UTSTransit.Services
             }
         }
 
+        // --- Booking Features ---
+
+        public async Task<(bool IsSuccess, string Message)> BookSlotAsync(Guid scheduleId)
+        {
+            try
+            {
+                var userId = GetCurrentUserId();
+                if (string.IsNullOrEmpty(userId)) return (false, "Not logged in");
+
+                var booking = new Models.Booking
+                {
+                    ScheduleId = scheduleId,
+                    StudentId = Guid.Parse(userId),
+                    BookingDate = DateTime.Today,
+                    Status = "Booked"
+                };
+
+                await _client.From<Models.Booking>().Insert(booking);
+                return (true, "Booking successful!");
+            }
+            catch (Exception ex)
+            {
+                if (ex.Message.Contains("duplicate"))
+                    return (false, "You have already booked this trip.");
+
+                return (false, $"Booking failed: {ex.Message}");
+            }
+        }
+
+        public async Task<List<Models.Booking>> GetStudentBookingsAsync()
+        {
+            try
+            {
+                var userId = GetCurrentUserId();
+                if (string.IsNullOrEmpty(userId)) return new List<Models.Booking>();
+
+                var response = await _client.From<Models.Booking>()
+                    .Where(x => x.StudentId == Guid.Parse(userId) && x.BookingDate == DateTime.Today)
+                    .Get();
+                return response.Models;
+            }
+            catch
+            {
+                return new List<Models.Booking>();
+            }
+        }
+
+        public async Task<List<string>> GetBookedStudentsForScheduleAsync(Guid scheduleId)
+        {
+            try
+            {
+                // 1. Get all bookings for this schedule today
+                var bookingsFn = await _client.From<Models.Booking>()
+                    .Where(x => x.ScheduleId == scheduleId && x.BookingDate == DateTime.Today)
+                    .Get();
+                
+                var bookings = bookingsFn.Models;
+                if (!bookings.Any()) return new List<string>();
+
+                // 2. Get student IDs
+                var studentIds = bookings.Select(b => b.StudentId.ToString()).ToList();
+
+                // 3. Fetch Profiles manually since Supabase-csharp join is tricky
+                // Note: Where(x => list.Contains(x.Id)) might not work directly in all client versions, but let's try 'In' filter
+                var profilesFn = await _client.From<Models.Profile>()
+                    .Filter("id", Supabase.Postgrest.Constants.Operator.In, studentIds)
+                    .Get();
+
+                return profilesFn.Models.Select(p => p.StudentId ?? p.Email).ToList();
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Error fetching student names: {ex.Message}");
+                return new List<string>();
+            }
+        }
+
         public async Task CreateScheduleAsync(ScheduleItem item)
         {
             await _client.From<ScheduleItem>().Insert(item);
@@ -305,6 +382,54 @@ namespace UTSTransit.Services
             catch
             {
                 return new List<TripPassenger>();
+            }
+        }
+
+        // --- Profile & Storage ---
+
+        public async Task<string?> UploadProfileImageAsync(string userId, FileResult file)
+        {
+            try
+            {
+                var fileName = $"{userId}_{DateTime.Now.Ticks}.jpg";
+                using var stream = await file.OpenReadAsync();
+                
+                // Standard Supabase Storage upload
+                var storage = _client.Storage.From("avatars");
+                
+                // Convert stream to byte array if stream upload issues occur, but stream should work
+                // Note: C# SDK signature usually takes byte[] or string path. 
+                // Let's use OpenReadAsync and copy to memory if needed, but Stream is usually supported.
+                // If the SDK requires byte[], we do:
+                byte[] fileBytes;
+                using (var memoryStream = new MemoryStream())
+                {
+                    await stream.CopyToAsync(memoryStream);
+                    fileBytes = memoryStream.ToArray();
+                }
+
+                await storage.Upload(fileBytes, fileName, new Supabase.Storage.FileOptions { Upsert = true });
+
+                // Get Public URL
+                return storage.GetPublicUrl(fileName);
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Upload Failed: {ex.Message}");
+                return null;
+            }
+        }
+
+        public async Task UpdateProfileAvatarAsync(string userId, string avatarUrl)
+        {
+            try
+            {
+                var update = new Models.Profile { Id = Guid.Parse(userId), AvatarUrl = avatarUrl };
+                await _client.From<Models.Profile>().Update(update);
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Profile Update Failed: {ex.Message}");
             }
         }
     }

@@ -44,6 +44,7 @@ export default function Users() {
                 <table>
                     <thead>
                         <tr>
+                            <th>Avatar</th>
                             <th>Email</th>
                             <th>Role</th>
                             <th>Details</th>
@@ -54,6 +55,15 @@ export default function Users() {
                     <tbody>
                         {users.map(user => (
                             <tr key={user.id}>
+                                <td>
+                                    {user.avatar_url ? (
+                                        <img src={user.avatar_url} alt="Avatar" style={{ width: '40px', height: '40px', borderRadius: '50%', objectFit: 'cover' }} />
+                                    ) : (
+                                        <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: '#eee', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#888' }}>
+                                            ?
+                                        </div>
+                                    )}
+                                </td>
                                 <td>{user.email}</td>
                                 <td>
                                     <span style={{

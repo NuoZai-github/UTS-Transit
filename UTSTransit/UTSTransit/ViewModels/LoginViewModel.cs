@@ -54,11 +54,16 @@ namespace UTSTransit.ViewModels
                     var role = _transitService.GetCurrentUserRole();
                     if (Shell.Current is AppShell appShell)
                     {
-                        appShell.SetDriverTabVisible(role == "driver");
+                        var isDriver = role == "driver";
+                        appShell.SetDriverTabVisible(isDriver);
+                        appShell.SetStudentTabsVisible(!isDriver); // Hide Schedule if Driver
                     }
 
                     // Navigate to main page
-                    await Shell.Current.GoToAsync("//MainTabs");
+                    if (role == "driver")
+                        await Shell.Current.GoToAsync("//DriverPage"); // Using ShellContent Route directly is often safer
+                    else
+                        await Shell.Current.GoToAsync("//MainTabs");
                 }
                 else
                 {

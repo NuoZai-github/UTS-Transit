@@ -37,9 +37,32 @@ namespace UTSTransit.ViewModels
         private bool _isBusy;
 #pragma warning restore MVVMTK0045
 
+        [ObservableProperty]
+        private ImageSource _profileImage = "dotnet_bot.png"; // Default placeholder
+        
+        private FileResult? _selectedImageFile;
+
         public SignUpViewModel(TransitService transitService)
         {
             _transitService = transitService;
+        }
+
+        [RelayCommand]
+        public async Task PickImage()
+        {
+            try
+            {
+                var result = await MediaPicker.PickPhotoAsync();
+                if (result != null)
+                {
+                    _selectedImageFile = result;
+                    ProfileImage = ImageSource.FromFile(result.FullPath);
+                }
+            }
+            catch (Exception ex)
+            {
+                StatusMessage = "Photo selection failed: " + ex.Message;
+            }
         }
 
         [RelayCommand]
@@ -84,6 +107,13 @@ namespace UTSTransit.ViewModels
                 }
             }
 
+            // --- Validate Image ---
+            if (_selectedImageFile == null)
+            {
+                StatusMessage = "Please select a profile picture.";
+                return; 
+            }
+
             IsBusy = true;
             StatusMessage = "Creating account...";
 
@@ -94,6 +124,21 @@ namespace UTSTransit.ViewModels
 
                 if (result.IsSuccess)
                 {
+                    StatusMessage = "Account created. Uploading avatar...";
+                    
+                    // Note: Supabase Auto SignIn usually happens on Registration, 
+                    // so CurrentUser should be populated.
+                    var userId = _transitService.GetCurrentUserId();
+                    
+                    if (!string.IsNullOrEmpty(userId))
+                    {
+                        var avatarUrl = await _transitService.UploadProfileImageAsync(userId, _selectedImageFile);
+                        if (!string.IsNullOrEmpty(avatarUrl))
+                        {
+                            await _transitService.UpdateProfileAvatarAsync(userId, avatarUrl);
+                        }
+                    }
+
                     StatusMessage = "Registration successful! Please login.";
                     await Shell.Current.GoToAsync("..");
                 }

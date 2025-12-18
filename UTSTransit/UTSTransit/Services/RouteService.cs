@@ -16,12 +16,18 @@ namespace UTSTransit.Services
                     RouteColor = Colors.Blue,
                     Coordinates = new List<Location>
                     {
-                        // Hostel (Kolej Laila Taib area)
-                        new Location(2.3180, 111.8300),
-                        // Jalan Teku
-                        new Location(2.3160, 111.8290),
-                        // UTS Campus
-                        new Location(2.3134, 111.8283)
+                        // Route A: Hostel -> Campus (Corrected Road Path)
+                        // Keeping latitude closer to 2.3420 to prevent "V" shape dip
+                        new Location(2.3420, 111.8318), // Hostel Start
+                        new Location(2.3419, 111.8325), // Exit Hostel
+                        new Location(2.3419, 111.8340), // Along Jalan Teku
+                        new Location(2.3419, 111.8360),
+                        new Location(2.3418, 111.8380), // Approaching Roundabout
+                        new Location(2.3416, 111.8395), // Roundabout / Junction area
+                        new Location(2.3415, 111.8410), // Entering Jalan University
+                        new Location(2.3412, 111.8425), // Campus Driveway
+                        new Location(2.3415, 111.8435), // Campus Road
+                        new Location(2.3417, 111.8442)  // Campus Main
                     }
                 },
                 new RouteInfo
@@ -30,12 +36,17 @@ namespace UTSTransit.Services
                     RouteColor = Colors.Red,
                     Coordinates = new List<Location>
                     {
-                        // UTS Campus
-                        new Location(2.3134, 111.8283),
-                        // Jalan Teku
-                        new Location(2.3160, 111.8290),
-                        // Hostel
-                        new Location(2.3180, 111.8300)
+                        // Route B: Campus -> Hostel (Reverse)
+                        new Location(2.3417, 111.8442),
+                        new Location(2.3415, 111.8435),
+                        new Location(2.3412, 111.8425),
+                        new Location(2.3415, 111.8410),
+                        new Location(2.3416, 111.8395),
+                        new Location(2.3418, 111.8380),
+                        new Location(2.3419, 111.8360),
+                        new Location(2.3419, 111.8340),
+                        new Location(2.3419, 111.8325),
+                        new Location(2.3420, 111.8318)
                     }
                 }
             };

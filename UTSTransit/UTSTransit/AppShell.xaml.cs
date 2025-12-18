@@ -16,5 +16,13 @@
                 DriverTab.IsVisible = isVisible;
             }
         }
+        
+        public void SetStudentTabsVisible(bool isVisible)
+        {
+            if (ScheduleTab != null) ScheduleTab.IsVisible = isVisible;
+            // Driver needs LiveMap but maybe not Announcements/Profile? 
+            // Requests: "Driver don't need to see this page" (Referring to image of Schedule page likely)
+            // Let's hide Schedule tab for Drivers.
+        }
     }
 }

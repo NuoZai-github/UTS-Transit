@@ -20,21 +20,19 @@
         <ScrollView Grid.Row="1">
             <VerticalStackLayout Spacing="24" Padding="24">
 
-                <!-- Route Selection Card -->
+                <!-- Schedule Selection -->
                 <Frame>
                     <VerticalStackLayout Spacing="12">
-                        <Label Text="Select Route" Style="{StaticResource CardTitleLabel}"/>
+                        <Label Text="Select Trip to View Passengers" Style="{StaticResource CardTitleLabel}"/>
                         <Border Style="{StaticResource InputContainer}">
-                            <Picker SelectedItem="{Binding SelectedRoute}" Title="Select a route">
-                                <Picker.ItemsSource>
-                                    <x:Array Type="{x:Type x:String}">
-                                        <x:String>Route A (Dorm -> Campus)</x:String>
-                                        <x:String>Route B (Campus -> Hostel)</x:String>
-                                        <x:String>Weekend Special</x:String>
-                                    </x:Array>
-                                </Picker.ItemsSource>
-                            </Picker>
+                            <Picker ItemsSource="{Binding Schedules}" 
+                                    SelectedItem="{Binding SelectedScheduleItem}"
+                                    ItemDisplayBinding="{Binding DepartureTime}"
+                                    Title="Select a departure time"/>
                         </Border>
+                         <Label Text="{Binding SelectedRoute}" 
+                                TextColor="{StaticResource TextSecondary}" 
+                                HorizontalOptions="Center"/>
                     </VerticalStackLayout>
                 </Frame>
 
@@ -50,6 +48,21 @@
                     </VerticalStackLayout>
                 </Frame>
 
+                <!-- Passenger List -->
+                <Frame IsVisible="{Binding SelectedScheduleItem, Converter={StaticResource IsNotNullConverter}}">
+                    <VerticalStackLayout Spacing="12">
+                         <Label Text="Passenger List" Style="{StaticResource CardTitleLabel}"/>
+                         <CollectionView ItemsSource="{Binding PassengerList}" HeightRequest="150" EmptyView="No bookings yet">
+                            <CollectionView.ItemTemplate>
+                                <DataTemplate>
+                                    <Border StrokeShape="RoundRectangle 8" BackgroundColor="{StaticResource PageBackground}" Padding="10" Margin="0,4" StrokeThickness="0">
+                                        <Label Text="{Binding .}" TextColor="{StaticResource TextPrimary}" />
+                                    </Border>
+                                </DataTemplate>
+                            </CollectionView.ItemTemplate>
+                         </CollectionView>
+                    </VerticalStackLayout>
+                </Frame>
                 <!-- Status Message -->
                 <Label Text="{Binding StatusMessage}" 
                        TextColor="{StaticResource Accent}"

@@ -57,18 +57,30 @@
                                        TextColor="{StaticResource TextSecondary}"/>
                             </VerticalStackLayout>
                             
-                            <!-- Status Badge -->
-                            <Border Grid.Column="2" 
-                                    StrokeShape="RoundRectangle 8" 
-                                    BackgroundColor="{StaticResource PageBackground}" 
-                                    StrokeThickness="0"
-                                    Padding="8,4"
-                                    VerticalOptions="Center">
-                                <Label Text="{Binding Status}" 
-                                       TextColor="{Binding StatusColor}" 
-                                       FontAttributes="Bold"
-                                       FontSize="12"/>
-                            </Border>
+                            <!-- Status and Book Action -->
+                            <VerticalStackLayout Grid.Column="2" Spacing="8" VerticalOptions="Center">
+                                <Border StrokeShape="RoundRectangle 8" 
+                                        BackgroundColor="{StaticResource PageBackground}" 
+                                        StrokeThickness="0"
+                                        Padding="8,4"
+                                        HorizontalOptions="End">
+                                    <Label Text="{Binding Status}" 
+                                           TextColor="{Binding StatusColor}" 
+                                           FontAttributes="Bold"
+                                           FontSize="12"/>
+                                </Border>
+
+                                <Button Text="{Binding ActionButtonText}"
+                                        BackgroundColor="{Binding ActionButtonColor}"
+                                        TextColor="White"
+                                        FontSize="12"
+                                        Padding="10,0"
+                                        HeightRequest="32"
+                                        CornerRadius="16"
+                                        Command="{Binding Source={RelativeSource AncestorType={x:Type vm:TimetableViewModel}}, Path=BookCommand}"
+                                        CommandParameter="{Binding .}"
+                                        IsEnabled="{Binding CanBook}" />
+                            </VerticalStackLayout>
                         </Grid>
                     </Frame>
                 </DataTemplate>

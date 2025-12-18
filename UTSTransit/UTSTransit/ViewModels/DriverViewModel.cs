@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using System.Collections.ObjectModel;
 using UTSTransit.Services;
 
 namespace UTSTransit.ViewModels
@@ -12,10 +13,10 @@ namespace UTSTransit.ViewModels
 
 #pragma warning disable MVVMTK0045 // Partial properties are recommended for WinRT compatibility
         [ObservableProperty]
-        private string _statusMessage = "Waiting to start trip...";
+        private string _statusMessage = "Select a trip to view passengers";
 
         [ObservableProperty]
-        private string _selectedRoute = "Route A (Dorm -> Campus)";
+        private string _selectedRoute = "Route A (Hostel -> Campus)";
 
         [ObservableProperty]
         private string _selectedStatus = "Driving";
@@ -31,12 +32,52 @@ namespace UTSTransit.ViewModels
 
         [ObservableProperty]
         private bool _isBusy;
+
+        // --- New Properties for Passenger View ---
+        [ObservableProperty]
+        private Models.ScheduleItem _selectedScheduleItem;
+
+        public ObservableCollection<Models.ScheduleItem> Schedules { get; } = new();
+        public ObservableCollection<string> PassengerList { get; } = new();
+
 #pragma warning restore MVVMTK0045
 
         public DriverViewModel(TransitService transitService)
         {
             _transitService = transitService;
             CheckDriverRole();
+            LoadSchedules();
+        }
+
+        private async void LoadSchedules()
+        {
+            var items = await _transitService.GetSchedulesAsync();
+            Schedules.Clear();
+            foreach (var item in items) Schedules.Add(item);
+        }
+
+        async partial void OnSelectedScheduleItemChanged(Models.ScheduleItem value)
+        {
+            if (value == null) return;
+            IsBusy = true;
+            SelectedRoute = value.RouteName; // Sync route name
+
+            // Fetch students
+            var students = await _transitService.GetBookedStudentsForScheduleAsync(value.Id);
+            PassengerList.Clear();
+            if (students.Count == 0)
+            {
+                 StatusMessage = "No bookings for this trip yet.";
+            }
+            else
+            {
+                StatusMessage = $"{students.Count} student(s) booked.";
+                foreach (var student in students)
+                {
+                    PassengerList.Add(student);
+                }
+            }
+            IsBusy = false;
         }
 
         private void CheckDriverRole()
@@ -105,12 +146,15 @@ namespace UTSTransit.ViewModels
                 if (location != null)
                 {
                     await _transitService.UpdateBusLocation(SelectedRoute, location.Latitude, location.Longitude, SelectedStatus);
-                    StatusMessage = $"Status: {SelectedStatus}\nLat: {location.Latitude:F4}, Lng: {location.Longitude:F4}";
+                    // Do not overwrite StatusMessage if it shows passenger count, maybe show toast or debug?
+                    // status message logic in OnSelectedScheduleItemChanged overwrites this.
+                    // Let's keep status message simple for now.
+                    // StatusMessage = $"Status: {SelectedStatus}\nLat: {location.Latitude:F4}, Lng: {location.Longitude:F4}";
                 }
             }
             catch (Exception ex)
             {
-                StatusMessage = $"GPS Error: {ex.Message}";
+                // StatusMessage = $"GPS Error: {ex.Message}";
             }
         }
     }

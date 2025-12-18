@@ -5,7 +5,7 @@ import { supabase } from '../supabaseClient'
 export default function Schedule() {
     const [items, setItems] = useState([])
     const [showModal, setShowModal] = useState(false)
-    const [formData, setFormData] = useState({ route_name: '', departure_time: '', day_type: 'Weekday' })
+    const [formData, setFormData] = useState({ route_name: '', departure_time: '', day_type: 'Daily' })
 
     useEffect(() => {
         fetchItems()
@@ -21,7 +21,7 @@ export default function Schedule() {
         const { error } = await supabase.from('schedules').insert([formData])
         if (!error) {
             setShowModal(false)
-            setFormData({ route_name: '', departure_time: '', day_type: 'Weekday' })
+            setFormData({ route_name: '', departure_time: '', day_type: 'Daily' })
             fetchItems()
         } else {
             alert(error.message)
@@ -79,7 +79,7 @@ export default function Schedule() {
                                 required
                             >
                                 <option value="">Select Route</option>
-                                <option value="Route A (Dorm -> Campus)">Route A (Dorm -&gt; Campus)</option>
+                                <option value="Route A (Hostel -> Campus)">Route A (Hostel -&gt; Campus)</option>
                                 <option value="Route B (Campus -> Hostel)">Route B (Campus -&gt; Hostel)</option>
                             </select>
                             <input
@@ -92,6 +92,7 @@ export default function Schedule() {
                                 value={formData.day_type}
                                 onChange={e => setFormData({ ...formData, day_type: e.target.value })}
                             >
+                                <option value="Daily">Daily</option>
                                 <option value="Weekday">Weekday</option>
                                 <option value="Weekend">Weekend</option>
                             </select>

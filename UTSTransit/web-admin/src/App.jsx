@@ -1,5 +1,8 @@
-
-import { BrowserRouter as Router, Routes, Route, NavLink } from 'react-router-dom'
+import { BrowserRouter as Router, Routes, Route, NavLink, Navigate } from 'react-router-dom'
+import { useEffect, useState } from 'react'
+import { supabase } from './supabaseClient'
+import Login from './pages/Login'
+import Signup from './pages/Signup'
 import Dashboard from './pages/Dashboard'
 import Users from './pages/Users'
 import MapPage from './pages/MapPage'
@@ -7,6 +10,41 @@ import Announcements from './pages/Announcements'
 import Schedule from './pages/Schedule'
 
 function App() {
+  const [session, setSession] = useState(null)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session)
+      setLoading(false)
+    })
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session)
+    })
+
+    return () => subscription.unsubscribe()
+  }, [])
+
+  async function handleLogout() {
+    await supabase.auth.signOut()
+  }
+
+  if (loading) return null
+
+  if (!session) {
+    return (
+      <Router>
+        <Routes>
+          <Route path="/signup" element={<Signup />} />
+          <Route path="*" element={<Login />} />
+        </Routes>
+      </Router>
+    )
+  }
+
   return (
     <Router>
       <div className="layout">
@@ -29,6 +67,11 @@ function App() {
               📅 Schedule
             </NavLink>
           </nav>
+          <div style={{ marginTop: 'auto' }}>
+            <button onClick={handleLogout} className="nav-link" style={{ background: 'none', border: 'none', width: '100%', cursor: 'pointer', textAlign: 'left' }}>
+              🚪 Logout
+            </button>
+          </div>
         </aside>
         <main className="content">
           <Routes>
@@ -37,6 +80,7 @@ function App() {
             <Route path="/map" element={<MapPage />} />
             <Route path="/announcements" element={<Announcements />} />
             <Route path="/schedule" element={<Schedule />} />
+            <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </main>
       </div>
