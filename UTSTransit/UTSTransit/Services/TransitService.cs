@@ -214,30 +214,7 @@ namespace UTSTransit.Services
 
         public bool IsUserLoggedIn => _client.Auth.CurrentUser != null && !string.IsNullOrEmpty(_client.Auth.CurrentSession?.AccessToken);
 
-        public List<Models.Announcement> GetAnnouncements()
-        {
-            return new List<Models.Announcement>
-            {
-                new Models.Announcement
-                {
-                    Title = "Heavy Rain Warning",
-                    Content = "Due to heavy rain, buses on Route B may be delayed by 10-15 minutes.",
-                    CreatedAt = DateTime.Now
-                },
-                new Models.Announcement
-                {
-                    Title = "Exam Week Schedule",
-                    Content = "During exam week, we will be adding extra buses on Route A between 8 AM and 10 AM.",
-                    CreatedAt = DateTime.Now.AddDays(-2)
-                },
-                new Models.Announcement
-                {
-                    Title = "App Maintenance",
-                    Content = "The UTS Transit app will undergo maintenance this Sunday from 2 AM to 4 AM.",
-                    CreatedAt = DateTime.Now.AddDays(-5)
-                }
-            };
-        }
+
 
         // 司机：上传位置
         public async Task UpdateBusLocation(string routeName, double lat, double lng, string status)

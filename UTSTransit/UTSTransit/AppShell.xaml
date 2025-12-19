@@ -14,19 +14,17 @@
         <Tab Title="I am Driver" Icon="dotnet_bot.png" x:Name="DriverTab" IsVisible="False">
             <ShellContent ContentTemplate="{DataTemplate views:DriverPage}" Route="DriverPage" />
         </Tab>
-        <Tab Title="Home" Icon="dotnet_bot.png">
+        <Tab Title="Home" Icon="nav_home.png">
             <ShellContent ContentTemplate="{DataTemplate views:HomePage}" />
         </Tab>
-        <Tab Title="Schedule" Icon="dotnet_bot.png" x:Name="ScheduleTab">
+        <Tab Title="Schedule" Icon="nav_schedule.png" x:Name="ScheduleTab">
             <ShellContent ContentTemplate="{DataTemplate views:TimetablePage}" />
         </Tab>
-        <Tab Title="Live Map" Icon="dotnet_bot.png">
-            <ShellContent ContentTemplate="{DataTemplate views:MapPage}" Route="MapPage" />
-        </Tab>
-        <Tab Title="News" Icon="dotnet_bot.png">
+
+        <Tab Title="News" Icon="nav_news.png">
             <ShellContent ContentTemplate="{DataTemplate views:AnnouncementsPage}" />
         </Tab>
-        <Tab Title="Profile" Icon="dotnet_bot.png">
+        <Tab Title="Profile" Icon="nav_profile.png">
             <ShellContent ContentTemplate="{DataTemplate views:ProfilePage}" />
         </Tab>
     </TabBar>

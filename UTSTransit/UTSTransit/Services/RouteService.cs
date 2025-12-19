@@ -52,21 +52,6 @@ namespace UTSTransit.Services
             };
         }
 
-        public List<TimetableItem> GetTimetable()
-        {
-            return new List<TimetableItem>
-            {
-                new TimetableItem { RouteName = "Route A", DepartureTime = "08:00 AM", Status = "On Time" },
-                new TimetableItem { RouteName = "Route B", DepartureTime = "08:15 AM", Status = "On Time" },
-                new TimetableItem { RouteName = "Route A", DepartureTime = "08:30 AM", Status = "Delayed" },
-                new TimetableItem { RouteName = "Route B", DepartureTime = "08:45 AM", Status = "On Time" },
-                new TimetableItem { RouteName = "Route A", DepartureTime = "09:00 AM", Status = "On Time" },
-                new TimetableItem { RouteName = "Route B", DepartureTime = "09:15 AM", Status = "On Time" },
-                new TimetableItem { RouteName = "Route A", DepartureTime = "09:30 AM", Status = "On Time" },
-                new TimetableItem { RouteName = "Route B", DepartureTime = "09:45 AM", Status = "Cancelled" },
-                new TimetableItem { RouteName = "Route A", DepartureTime = "10:00 AM", Status = "On Time" },
-                new TimetableItem { RouteName = "Route B", DepartureTime = "10:15 AM", Status = "On Time" },
-            };
-        }
+
     }
 }

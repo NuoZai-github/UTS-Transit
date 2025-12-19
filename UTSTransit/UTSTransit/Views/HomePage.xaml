@@ -128,16 +128,48 @@
 
         <!-- Quick Actions -->
         <Grid Grid.Row="2" ColumnDefinitions="*, *" ColumnSpacing="16">
-            <Button Text="View Map" 
-                    Style="{StaticResource AccentButton}"
-                    ImageSource="map_icon.png"/> <!-- Placeholder icon -->
+            <!-- View Map Custom Button -->
+            <Frame Grid.Column="0"
+                   CornerRadius="12"
+                   Padding="0"
+                   HasShadow="False"
+                   HeightRequest="52"
+                   BorderColor="Transparent"
+                   BackgroundColor="{StaticResource Primary}">
+                 <Frame.GestureRecognizers>
+                     <TapGestureRecognizer Command="{Binding GoToMapCommand}" />
+                 </Frame.GestureRecognizers>
+                 <HorizontalStackLayout HorizontalOptions="Center" VerticalOptions="Center" Spacing="15">
+                     <Image Source="map_icon.png" 
+                            HeightRequest="32" 
+                            WidthRequest="32" 
+                            VerticalOptions="Center"/>
+                     <Label Text="View Map" 
+                            TextColor="White" 
+                            FontAttributes="Bold" 
+                            VerticalOptions="Center"/>
+                 </HorizontalStackLayout>
+            </Frame>
             
-            <Button Grid.Column="1" 
-                    Text="Schedule" 
-                    BackgroundColor="{StaticResource Surface}"
-                    TextColor="{StaticResource Primary}"
-                    BorderColor="{StaticResource Primary}"
-                    BorderWidth="1"/>
+            <!-- Schedule Custom Button -->
+            <Frame Grid.Column="1"
+                   CornerRadius="12"
+                   Padding="0"
+                   HasShadow="False"
+                   HeightRequest="52"
+                   BorderColor="{StaticResource Primary}"
+                   BackgroundColor="{StaticResource Surface}">
+                 <HorizontalStackLayout HorizontalOptions="Center" VerticalOptions="Center" Spacing="15">
+                     <Image Source="schedule_icon.png" 
+                            HeightRequest="32" 
+                            WidthRequest="32" 
+                            VerticalOptions="Center"/>
+                     <Label Text="Schedule" 
+                            TextColor="{StaticResource Primary}" 
+                            FontAttributes="Bold" 
+                            VerticalOptions="Center"/>
+                 </HorizontalStackLayout>
+            </Frame>
         </Grid>
     </Grid>
 </ContentPage>

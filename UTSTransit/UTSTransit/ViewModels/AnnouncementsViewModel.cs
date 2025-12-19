@@ -17,9 +17,9 @@ namespace UTSTransit.ViewModels
             LoadAnnouncements();
         }
 
-        private void LoadAnnouncements()
+        public async void LoadAnnouncements()
         {
-            var items = _transitService.GetAnnouncements();
+            var items = await _transitService.GetAnnouncementsAsync();
             Announcements.Clear();
             foreach (var item in items)
             {

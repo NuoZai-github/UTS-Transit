@@ -1,6 +1,7 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using UTSTransit.Services;
 using UTSTransit.Models;
+using CommunityToolkit.Mvvm.Input;
 
 namespace UTSTransit.ViewModels
 {
@@ -178,6 +179,12 @@ namespace UTSTransit.ViewModels
         private double Deg2Rad(double deg)
         {
             return deg * (Math.PI / 180);
+        }
+
+        [RelayCommand]
+        private async Task GoToMap()
+        {
+            await Shell.Current.GoToAsync("MapPage");
         }
     }
 }
