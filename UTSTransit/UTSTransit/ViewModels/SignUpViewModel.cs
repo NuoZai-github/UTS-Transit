@@ -9,6 +9,11 @@ namespace UTSTransit.ViewModels
         private readonly TransitService _transitService;
 
 #pragma warning disable MVVMTK0045
+        public SignUpViewModel(TransitService transitService)
+        {
+            _transitService = transitService;
+        }
+
         [ObservableProperty]
         private string _email = string.Empty;
 
@@ -34,36 +39,11 @@ namespace UTSTransit.ViewModels
         private string _statusMessage = string.Empty;
 
         [ObservableProperty]
-        private bool _isBusy;
-#pragma warning restore MVVMTK0045
+        private string _fullName = string.Empty;
 
         [ObservableProperty]
-        private ImageSource _profileImage = "dotnet_bot.png"; // Default placeholder
-        
-        private FileResult? _selectedImageFile;
-
-        public SignUpViewModel(TransitService transitService)
-        {
-            _transitService = transitService;
-        }
-
-        [RelayCommand]
-        public async Task PickImage()
-        {
-            try
-            {
-                var result = await MediaPicker.PickPhotoAsync();
-                if (result != null)
-                {
-                    _selectedImageFile = result;
-                    ProfileImage = ImageSource.FromFile(result.FullPath);
-                }
-            }
-            catch (Exception ex)
-            {
-                StatusMessage = "Photo selection failed: " + ex.Message;
-            }
-        }
+        private bool _isBusy;
+#pragma warning restore MVVMTK0045
 
         [RelayCommand]
         public async Task Register()
@@ -73,6 +53,12 @@ namespace UTSTransit.ViewModels
             if (string.IsNullOrWhiteSpace(Email) || string.IsNullOrWhiteSpace(Password))
             {
                 StatusMessage = "Please enter email and password.";
+                return;
+            }
+
+            if (string.IsNullOrWhiteSpace(FullName))
+            {
+                StatusMessage = "Please enter your Real Full Name.";
                 return;
             }
 
@@ -107,39 +93,43 @@ namespace UTSTransit.ViewModels
                 }
             }
 
-            // --- Validate Image ---
-            if (_selectedImageFile == null)
-            {
-                StatusMessage = "Please select a profile picture.";
-                return; 
-            }
-
             IsBusy = true;
             StatusMessage = "Creating account...";
 
             try
             {
+                if (_transitService == null)
+                {
+                    StatusMessage = "Error: Service unavailable.";
+                    return;
+                }
+
+                StatusMessage = "Connecting...";
                 await _transitService.InitializeAsync();
-                var result = await _transitService.RegisterAsync(Email, Password, role, StudentId, IcNumber);
+                
+                StatusMessage = "Creating account...";
+                var result = await _transitService.RegisterAsync(
+                    Email ?? "", 
+                    Password ?? "", 
+                    role ?? "student", 
+                    FullName ?? "", 
+                    StudentId, 
+                    IcNumber);
 
                 if (result.IsSuccess)
                 {
-                    StatusMessage = "Account created. Uploading avatar...";
-                    
-                    // Note: Supabase Auto SignIn usually happens on Registration, 
-                    // so CurrentUser should be populated.
-                    var userId = _transitService.GetCurrentUserId();
-                    
-                    if (!string.IsNullOrEmpty(userId))
+                    // Case 1: Email Confirmation Required (Common for this assignment setup)
+                    if (!string.IsNullOrEmpty(result.ErrorMessage) && 
+                       (result.ErrorMessage.Contains("verification") || result.ErrorMessage.ToLower().Contains("confirmed")))
                     {
-                        var avatarUrl = await _transitService.UploadProfileImageAsync(userId, _selectedImageFile);
-                        if (!string.IsNullOrEmpty(avatarUrl))
-                        {
-                            await _transitService.UpdateProfileAvatarAsync(userId, avatarUrl);
-                        }
+                        await Shell.Current.DisplayAlert("Registration Successful", 
+                            "Please check your email to verify your account before logging in.", "OK");
+                        await Shell.Current.GoToAsync(".."); // Return to Login Page
+                        return;
                     }
 
-                    StatusMessage = "Registration successful! Please login.";
+                    // Case 2: Auto-login worked
+                    await Shell.Current.DisplayAlert("Success", "Account created successfully.", "OK");
                     await Shell.Current.GoToAsync("..");
                 }
                 else

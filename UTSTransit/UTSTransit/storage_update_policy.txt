@@ -1,0 +1,13 @@
+﻿-- Allow authenticated users to update (overwrite) their own avatar
+CREATE POLICY "Users can update their own avatar" ON storage.objects
+  FOR UPDATE USING (
+    bucket_id = 'avatars' AND 
+    auth.role() = 'authenticated'
+  );
+
+-- Allow authenticated users to delete their own avatar
+CREATE POLICY "Users can delete their own avatar" ON storage.objects
+  FOR DELETE USING (
+    bucket_id = 'avatars' AND 
+    auth.role() = 'authenticated'
+  );

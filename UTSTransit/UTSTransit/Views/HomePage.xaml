@@ -11,64 +11,98 @@
         <!-- Header Section -->
         <Grid ColumnDefinitions="*, Auto">
             <VerticalStackLayout Spacing="4">
-                <Label Text="Good Morning," 
+                <Label Text="{Binding Greeting}" 
                        FontSize="16" 
                        TextColor="{StaticResource TextSecondary}"/>
-                <Label Text="Student" 
+                <Label Text="{Binding UserName}" 
                        Style="{StaticResource HeaderLabel}"/>
             </VerticalStackLayout>
             
-            <!-- Profile/Settings Icon Placeholder -->
+            <!-- Profile/Settings Icon -->
             <Border Grid.Column="1" 
                     StrokeShape="RoundRectangle 20" 
                     HeightRequest="40" 
                     WidthRequest="40" 
                     StrokeThickness="0"
                     BackgroundColor="{StaticResource PrimaryLight}"
-                    VerticalOptions="Start">
-                <Label Text="👤" 
-                       HorizontalOptions="Center" 
-                       VerticalOptions="Center"
-                       TextColor="{StaticResource Primary}"/>
+                    VerticalOptions="Start"
+                    Padding="0">
+                <Grid>
+                    <!-- Fallback Icon -->
+                    <Label Text="👤" 
+                           HorizontalOptions="Center" 
+                           VerticalOptions="Center"
+                           TextColor="{StaticResource Primary}">
+                        <Label.Triggers>
+                            <DataTrigger TargetType="Label" Binding="{Binding HasAvatar}" Value="True">
+                                <Setter Property="IsVisible" Value="False" />
+                            </DataTrigger>
+                        </Label.Triggers>
+                    </Label>
+
+                    <!-- Avatar Image -->
+                    <Image Source="{Binding UserAvatar}" 
+                           Aspect="AspectFill"
+                           IsVisible="{Binding HasAvatar}"
+                           HeightRequest="40"
+                           WidthRequest="40"/>
+                </Grid>
             </Border>
         </Grid>
 
         <!-- Main Status Card (Floating Effect) -->
-        <Frame Grid.Row="1" VerticalOptions="Center" CornerRadius="24" HasShadow="True" Padding="0">
+        <Frame Grid.Row="1" VerticalOptions="Center" CornerRadius="24" HasShadow="True" Padding="0" BackgroundColor="{StaticResource Surface}">
             <Grid RowDefinitions="200, Auto">
-                <!-- Animation Background -->
-                <Grid BackgroundColor="{StaticResource PrimaryLight}">
-                    <!-- Road -->
-                    <BoxView HeightRequest="2" Color="{StaticResource Border}" VerticalOptions="Center" />
+                <!-- Visual Tracking Area -->
+                <Grid BackgroundColor="{StaticResource PrimaryLight}" Padding="15">
                     
-                    <!-- Bus -->
-                    <Image x:Name="BusImage" 
-                           Source="bus_side.png" 
-                           HeightRequest="80" 
-                           WidthRequest="120" 
-                           HorizontalOptions="Start" 
-                           VerticalOptions="Center"
-                           TranslationY="-10"/>
+                    <!-- Road Line -->
+                    <BoxView HeightRequest="6" 
+                             Color="#D0D0D0" 
+                             CornerRadius="3"
+                             VerticalOptions="Center" 
+                             HorizontalOptions="Fill" 
+                             Margin="45,0,45,20" /> <!-- Added bottom margin to align with icon centers -->
+
+                    <!-- Hostel Station (Left) -->
+                    <VerticalStackLayout HorizontalOptions="Start" VerticalOptions="Center" Spacing="4">
+                        <Image Source="hostel_icon.png" HeightRequest="48" WidthRequest="48" Aspect="AspectFit"/>
+                        <Label Text="Hostel" FontSize="12" FontAttributes="Bold" TextColor="{StaticResource Primary}" HorizontalOptions="Center"/>
+                    </VerticalStackLayout>
+
+                    <!-- Campus Station (Right) -->
+                    <VerticalStackLayout HorizontalOptions="End" VerticalOptions="Center" Spacing="4">
+                        <Image Source="campus_icon.png" HeightRequest="48" WidthRequest="48" Aspect="AspectFit"/>
+                        <Label Text="Campus" FontSize="12" FontAttributes="Bold" TextColor="{StaticResource Primary}" HorizontalOptions="Center"/>
+                    </VerticalStackLayout>
+
+                    <!-- Moving Bus Layer -->
+                    <!-- Margin matches the icons center roughly -->
+                    <AbsoluteLayout VerticalOptions="Center" HeightRequest="80" Margin="45,0,45,20">
+                        <Image Source="bus_side.png"
+                               HeightRequest="50"
+                               WidthRequest="80"
+                               Aspect="AspectFit"
+                               AbsoluteLayout.LayoutBounds="{Binding BusProgress, StringFormat='{0}, 0.5, 80, 50'}"
+                               AbsoluteLayout.LayoutFlags="PositionProportional"
+                               IsVisible="{Binding IsBusVisible}"/>
+                    </AbsoluteLayout>
                     
-                    <!-- Stop Sign -->
-                    <Image x:Name="StopSign"
-                           Source="stop_sign.png"
-                           HeightRequest="60"
-                           WidthRequest="60"
-                           HorizontalOptions="Center"
-                           VerticalOptions="Center"
-                           IsVisible="False"/>
-                    
-                    <!-- Zzz -->
-                    <Label x:Name="ZzzText"
-                           Text="Zzz..."
-                           FontSize="32"
-                           FontAttributes="Bold"
-                           TextColor="{StaticResource Primary}"
-                           HorizontalOptions="Center"
-                           VerticalOptions="Start"
-                           TranslationY="-60"
-                           IsVisible="False"/>
+                    <!-- Stopped State Overlay -->
+                     <VerticalStackLayout HorizontalOptions="Center" VerticalOptions="Center" Spacing="8">
+                         <VerticalStackLayout.Triggers>
+                            <DataTrigger TargetType="VerticalStackLayout" Binding="{Binding IsBusVisible}" Value="True">
+                                <Setter Property="IsVisible" Value="False"/>
+                            </DataTrigger>
+                             <DataTrigger TargetType="VerticalStackLayout" Binding="{Binding IsBusVisible}" Value="False">
+                                <Setter Property="IsVisible" Value="True"/>
+                            </DataTrigger>
+                        </VerticalStackLayout.Triggers>
+                        
+                        <Image Source="stop_sign.png" HeightRequest="50" WidthRequest="50" />
+                        <Label Text="Not In Service" TextColor="{StaticResource Error}" FontAttributes="Bold" HorizontalOptions="Center"/>
+                    </VerticalStackLayout>
+
                 </Grid>
 
                 <!-- Status Info -->

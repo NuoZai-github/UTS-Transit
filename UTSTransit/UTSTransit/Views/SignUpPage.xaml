@@ -14,29 +14,16 @@
                    FontAttributes="Bold"
                    HorizontalOptions="Center" />
 
-            <!-- Profile Picture Selection -->
-            <VerticalStackLayout Spacing="10" HorizontalOptions="Center">
-                <Frame WidthRequest="120" HeightRequest="120" CornerRadius="60" 
-                       Padding="0" IsClippedToBounds="True" BorderColor="{StaticResource Primary}" 
-                       HorizontalOptions="Center">
-                    <Image Source="{Binding ProfileImage}" Aspect="AspectFill"
-                           WidthRequest="120" HeightRequest="120">
-                        <Image.GestureRecognizers>
-                            <TapGestureRecognizer Command="{Binding PickImageCommand}"/>
-                        </Image.GestureRecognizers>
-                    </Image>
-                    <Frame.GestureRecognizers>
-                        <TapGestureRecognizer Command="{Binding PickImageCommand}"/>
-                    </Frame.GestureRecognizers>
-                </Frame>
-                
-                <Button Text="Upload Photo" 
-                        Command="{Binding PickImageCommand}" 
-                        FontSize="12" 
-                        BackgroundColor="Transparent" 
-                        TextColor="{StaticResource Primary}" 
-                        HeightRequest="30" 
-                        Padding="0"/>
+            <!-- (Avatar selection moved to Profile Page after login) -->
+
+            <!-- Full Name with Note -->
+            <VerticalStackLayout Spacing="5">
+                <Entry Placeholder="Full Name (Real Name)"
+                       Text="{Binding FullName}" />
+                <Label Text="*Please use your real full name as per ID" 
+                       FontSize="10" 
+                       TextColor="{StaticResource TextSecondary}"
+                       Margin="5,0,0,0"/>
             </VerticalStackLayout>
 
             <Entry Placeholder="Email"

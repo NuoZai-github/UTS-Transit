@@ -17,7 +17,7 @@ namespace UTSTransit.Services
             var options = new Supabase.SupabaseOptions
             {
                 AutoRefreshToken = true,
-                AutoConnectRealtime = false // Disable auto-connect to prevent startup errors
+                AutoConnectRealtime = false
             };
             _client = new Supabase.Client(SupabaseUrl, SupabaseKey, options);
         }
@@ -58,13 +58,14 @@ namespace UTSTransit.Services
         }
 
         // 身份验证：注册
-        public async Task<(bool IsSuccess, string ErrorMessage)> RegisterAsync(string email, string password, string role, string studentId = null, string icNumber = null)
+        public async Task<(bool IsSuccess, string ErrorMessage)> RegisterAsync(string email, string password, string role, string fullName, string studentId = null, string icNumber = null)
         {
             try
             {
                 var data = new Dictionary<string, object>
                 {
-                    { "role", role }
+                    { "role", role },
+                    { "full_name", fullName }
                 };
 
                 if (!string.IsNullOrEmpty(studentId)) data.Add("student_id", studentId);
@@ -83,17 +84,90 @@ namespace UTSTransit.Services
                 if (session.User != null && session.User.Identities != null && session.User.Identities.Count == 0)
                      return (false, "User already exists or email is invalid.");
 
+                // Check if we actually have a session token. 
+                // If Email Confirmation is OFF, we should have one.
+                // If it's ON, we won't. But User assumes it's OFF for this Assignment.
+                // If Session is missing but User exists, try explicit login!
+                if (session.User != null && session.AccessToken == null)
+                {
+                    try 
+                    {
+                        // Try immediate login to allow uploading avatar
+                        var loginSession = await _client.Auth.SignIn(email, password);
+                        if (loginSession != null && loginSession.AccessToken != null)
+                        {
+                             try 
+                             {
+                                 var p = new Models.Profile 
+                                 {
+                                     Id = Guid.Parse(loginSession.User.Id),
+                                     Email = email,
+                                     Role = role,
+                                     FullName = fullName,
+                                     StudentId = studentId,
+                                     IcNumber = icNumber,
+                                     UpdatedAt = DateTime.UtcNow
+                                 };
+                                 await _client.From<Models.Profile>().Upsert(p);
+                             }
+                             catch (Exception manualEx) 
+                             {
+                                 Debug.WriteLine($"Manual Profile Upsert failed: {manualEx.Message}");
+                             }
+
+                             return (true, string.Empty);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        var msg = ex.Message ?? "";
+                        if (msg.Contains("Email not confirmed") || msg.ToLower().Contains("confirmed"))
+                        {
+                            return (true, "Account created! verification link sent to email.");
+                        }
+                    }
+                    
+                    // Failed to auto-login (maybe confirmation really is required?)
+                    return (true, "Account created, but auto-login failed. Please verify email or login manually.");
+                }
+
+                if (session.User != null && !string.IsNullOrEmpty(session.AccessToken))
+                {
+                     try 
+                     {
+                         // Robustness: Explicitly save Profile data in case DB Trigger failed
+                         var newProfile = new Models.Profile 
+                         {
+                             Id = Guid.Parse(session.User.Id),
+                             Email = email,
+                             Role = role,
+                             FullName = fullName,
+                             StudentId = studentId,
+                             IcNumber = icNumber,
+                             UpdatedAt = DateTime.UtcNow
+                         };
+                         
+                         // Use Upsert to create or update
+                         await _client.From<Models.Profile>().Upsert(newProfile);
+                     }
+                     catch (Exception pEx)
+                     {
+                         Debug.WriteLine($"Profile Manual Sync Warning: {pEx.Message}");
+                         // Continue, do not fail registration
+                     }
+                }
+
                 return (true, string.Empty);
             }
             catch (HttpRequestException httpEx)
             {
                 Debug.WriteLine($"Register Network Error: {httpEx.Message}");
-                return (false, "Network error. Please check your internet connection or if the Supabase project is paused.");
+                return (false, "Network error. Please check your internet connection.");
             }
             catch (Exception ex)
             {
                 Debug.WriteLine($"Register Failed: {ex.Message}");
-                return (false, ex.Message);
+                return (false, ex.Message ?? "Unknown registration error.");
             }
         }
 
@@ -118,14 +192,14 @@ namespace UTSTransit.Services
             }
         }
 
-        public string GetCurrentUserId()
+        public string? GetCurrentUserId()
         {
-            return _client.Auth.CurrentUser?.Id ?? "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11";
+            return _client.Auth.CurrentUser?.Id;
         }
 
         public string GetCurrentUserEmail()
         {
-            return _client.Auth.CurrentUser?.Email ?? "Guest User";
+            return _client.Auth.CurrentUser?.Email ?? "Guest";
         }
 
         public string GetCurrentUserRole()
@@ -138,7 +212,7 @@ namespace UTSTransit.Services
             return "student"; 
         }
 
-        public bool IsUserLoggedIn => _client.Auth.CurrentUser != null;
+        public bool IsUserLoggedIn => _client.Auth.CurrentUser != null && !string.IsNullOrEmpty(_client.Auth.CurrentSession?.AccessToken);
 
         public List<Models.Announcement> GetAnnouncements()
         {
@@ -391,16 +465,12 @@ namespace UTSTransit.Services
         {
             try
             {
-                var fileName = $"{userId}_{DateTime.Now.Ticks}.jpg";
+                // Fixed filename per user to replace old avatar
+                var fileName = $"{userId}_avatar.jpg";
                 using var stream = await file.OpenReadAsync();
                 
-                // Standard Supabase Storage upload
                 var storage = _client.Storage.From("avatars");
                 
-                // Convert stream to byte array if stream upload issues occur, but stream should work
-                // Note: C# SDK signature usually takes byte[] or string path. 
-                // Let's use OpenReadAsync and copy to memory if needed, but Stream is usually supported.
-                // If the SDK requires byte[], we do:
                 byte[] fileBytes;
                 using (var memoryStream = new MemoryStream())
                 {
@@ -408,15 +478,16 @@ namespace UTSTransit.Services
                     fileBytes = memoryStream.ToArray();
                 }
 
+                // Upload with Upsert=true to overwrite existing file
                 await storage.Upload(fileBytes, fileName, new Supabase.Storage.FileOptions { Upsert = true });
 
-                // Get Public URL
                 return storage.GetPublicUrl(fileName);
             }
             catch (Exception ex)
             {
                 Debug.WriteLine($"Upload Failed: {ex.Message}");
-                return null;
+                // Rethrow to let UI know
+                throw new Exception($"Storage error: {ex.Message}");
             }
         }
 
@@ -424,12 +495,65 @@ namespace UTSTransit.Services
         {
             try
             {
-                var update = new Models.Profile { Id = Guid.Parse(userId), AvatarUrl = avatarUrl };
-                await _client.From<Models.Profile>().Update(update);
+                // Use RPC (Remote Procedure Call) to bypass strict Table RLS.
+                // The function 'update_avatar' runs with SECURITY DEFINER (Admin) privileges.
+                var parameters = new Dictionary<string, object>
+                {
+                    { "p_avatar_url", avatarUrl }
+                };
+
+                await _client.Rpc("update_avatar", parameters);
+                Debug.WriteLine($"[Profile] Updated Avatar via RPC: {avatarUrl}");
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"Profile Update Failed: {ex.Message}");
+                Debug.WriteLine($"RPC Update Failed: {ex.Message}");
+                // Rethrow for UI
+                throw new Exception($"Failed to update profile: {ex.Message}");
+            }
+        }
+
+        public async Task<Models.Profile?> GetCurrentUserProfileAsync()
+        {
+            var userId = GetCurrentUserId();
+            if (string.IsNullOrEmpty(userId)) return null;
+
+            try
+            {
+                // Attempt to fetch profile using RPC to bypass any RLS restriction on SELECT
+                // The 'get_my_profile' function (if created) returns the user's profile ignoring RLS
+                var response = await _client.Rpc("get_my_profile", null);
+                
+                if (response != null && !string.IsNullOrEmpty(response.Content))
+                {
+                    // The function returns a TABLE, which comes back as a JSON Array
+                    var profiles = Newtonsoft.Json.JsonConvert.DeserializeObject<List<Models.Profile>>(response.Content);
+                    if (profiles != null && profiles.Any())
+                    {
+                        Debug.WriteLine($"[Profile] Fetched via RPC: {profiles.First().Email}");
+                        return profiles.First();
+                    }
+                }
+                
+                // If RPC return empty or failed (e.g. function not exists), try standard SELECT
+                Debug.WriteLine("[Profile] RPC returned empty, trying standard Select...");
+                var stdResponse = await _client.From<Models.Profile>()
+                    .Where(x => x.Id == Guid.Parse(userId))
+                    .Get();
+                return stdResponse.Models.FirstOrDefault();
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Fetch Profile Error (RPC+Standard): {ex.Message}");
+                // Last ditch effort: Try standard select if RPC crashed
+                 try 
+                {
+                    var response = await _client.From<Models.Profile>()
+                        .Where(x => x.Id == Guid.Parse(userId))
+                        .Get();
+                    return response.Models.FirstOrDefault();
+                }
+                catch { return null; }
             }
         }
     }

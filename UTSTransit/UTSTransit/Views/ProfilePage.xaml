@@ -9,15 +9,30 @@
     <ScrollView>
         <VerticalStackLayout Spacing="20" Padding="30" VerticalOptions="Center">
 
-            <Image Source="dotnet_bot.png"
-                   HeightRequest="100"
-                   WidthRequest="100"
+            <Frame CornerRadius="50" 
+                   HeightRequest="100" 
+                   WidthRequest="100" 
                    HorizontalOptions="Center" 
-                   Margin="0,0,0,10"/>
+                   Padding="0" 
+                   IsClippedToBounds="True"
+                   BorderColor="{StaticResource Primary}"
+                   BackgroundColor="LightGray">
+                <Grid>
+                    <Image Source="{Binding UserAvatar}" Aspect="AspectFill" />
+                    <!-- Camera icon removed to avoid obstructing the photo -->
+                    <Grid.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding UploadAvatarCommand}" />
+                    </Grid.GestureRecognizers>
+                </Grid>
+            </Frame>
+            <Label Text="Tap to change avatar" FontSize="10" HorizontalOptions="Center" TextColor="Gray"/>
 
-            <Label Text="My Account"
+            <Label Text="{Binding FullName}"
                    Style="{StaticResource TitleLabel}"
                    HorizontalOptions="Center" />
+            
+            <Label Text="{Binding Role, StringFormat='Role: {0}'}"
+                   HorizontalOptions="Center" TextColor="Gray" Margin="0,-10,0,10"/>
 
             <Border StrokeShape="RoundRectangle 8" Stroke="{AppThemeBinding Light={StaticResource Border}, Dark={StaticResource BorderDark}}" Padding="20" BackgroundColor="{AppThemeBinding Light={StaticResource PageBackground}, Dark={StaticResource SurfaceDark}}">
                 <VerticalStackLayout Spacing="5">

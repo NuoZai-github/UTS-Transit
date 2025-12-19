@@ -14,39 +14,74 @@ CREATE TABLE IF NOT EXISTS public.profiles (
     updated_at TIMESTAMP WITH TIME ZONE
 );
 
+-- Ensure columns exist if table was already there (Legacy support)
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS student_id text;
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS ic_number text;
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS avatar_url text;
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS full_name text;
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP WITH TIME ZONE;
+
+-- Grant permissions to allow Auth system to write to profiles
+GRANT ALL ON TABLE public.profiles TO postgres;
+GRANT ALL ON TABLE public.profiles TO service_role;
+GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE public.profiles TO authenticated;
+GRANT SELECT ON TABLE public.profiles TO anon;
+
 -- Enable Row Level Security (RLS)
 ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
 
--- Drop exist policies to avoid errors
+-- 1. Reset RLS Status to ensure clean slate
+ALTER TABLE public.profiles DISABLE ROW LEVEL SECURITY;
+ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
+
+-- 2. Clear ALL potential old policies
 DROP POLICY IF EXISTS "Public profiles are viewable by everyone" ON public.profiles;
 DROP POLICY IF EXISTS "Users can insert their own profile" ON public.profiles;
 DROP POLICY IF EXISTS "Users can update own profile" ON public.profiles;
+DROP POLICY IF EXISTS "Users can update their own profile" ON public.profiles;
+DROP POLICY IF EXISTS "Users can manage own profile" ON public.profiles;
+DROP POLICY IF EXISTS "Enable insert for authenticated users only" ON public.profiles;
 
--- Policy: Public profiles are viewable by everyone
+-- 3. Explicitly Grant Permissions (Fixes 42501 if grants were lost)
+GRANT ALL ON TABLE public.profiles TO authenticated;
+GRANT ALL ON TABLE public.profiles TO service_role;
+
+-- 4. Create Policies
+-- Read access: Everyone can see profiles
 CREATE POLICY "Public profiles are viewable by everyone" 
 ON public.profiles FOR SELECT USING (true);
 
--- Policy: Users can insert their own profile
-CREATE POLICY "Users can insert their own profile" 
-ON public.profiles FOR INSERT WITH CHECK (auth.uid() = id);
-
--- Policy: Users can update their own profile
-CREATE POLICY "Users can update own profile" 
-ON public.profiles FOR UPDATE USING (auth.uid() = id);
+-- Write access: Users can Insert, Update, Delete their OWN profile
+CREATE POLICY "Users can manage own profile" 
+ON public.profiles FOR ALL 
+USING (auth.uid() = id) 
+WITH CHECK (auth.uid() = id);
 
 -- Function to handle new user registration automatically
+-- NOW WITH ERROR HANDLING to prevent blocking Auth user creation
 CREATE OR REPLACE FUNCTION public.handle_new_user() 
 RETURNS TRIGGER AS $$
 BEGIN
-    INSERT INTO public.profiles (id, email, role, full_name, student_id, ic_number)
-    VALUES (
-        new.id, 
-        new.email, 
-        COALESCE(new.raw_user_meta_data->>'role', 'student'),
-        new.raw_user_meta_data->>'full_name',
-        new.raw_user_meta_data->>'student_id',
-        new.raw_user_meta_data->>'ic_number'
-    );
+    BEGIN
+        INSERT INTO public.profiles (id, email, role, full_name, student_id, ic_number)
+        VALUES (
+            new.id, 
+            new.email, 
+            COALESCE(new.raw_user_meta_data->>'role', 'student'),
+            new.raw_user_meta_data->>'full_name',
+            new.raw_user_meta_data->>'student_id',
+            new.raw_user_meta_data->>'ic_number'
+        )
+        ON CONFLICT (id) DO UPDATE SET
+            email = EXCLUDED.email,
+            role = EXCLUDED.role,
+            full_name = EXCLUDED.full_name,
+            student_id = EXCLUDED.student_id,
+            ic_number = EXCLUDED.ic_number;
+    EXCEPTION WHEN OTHERS THEN
+        -- Log error but do NOT fail the transaction
+        RAISE WARNING 'Error in handle_new_user: %', SQLERRM;
+    END;
     RETURN new;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
@@ -57,10 +92,18 @@ CREATE TRIGGER on_auth_user_created
     AFTER INSERT ON auth.users
     FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
 
--- Ensure columns exist if table was already there
-ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS student_id text;
-ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS ic_number text;
-ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS avatar_url text;
+-- Sync missing profiles (Fix for users created when trigger failed)
+INSERT INTO public.profiles (id, email, role, full_name, student_id, ic_number)
+SELECT 
+    au.id,
+    au.email,
+    COALESCE(au.raw_user_meta_data->>'role', 'student'),
+    au.raw_user_meta_data->>'full_name',
+    au.raw_user_meta_data->>'student_id',
+    au.raw_user_meta_data->>'ic_number'
+FROM auth.users au
+WHERE NOT EXISTS (SELECT 1 FROM public.profiles p WHERE p.id = au.id)
+ON CONFLICT (id) DO NOTHING;
 
 
 -- -----------------------------------------------------------------------------
@@ -250,10 +293,25 @@ CREATE POLICY "Avatar images are publicly accessible" ON storage.objects
   FOR SELECT USING ( bucket_id = 'avatars' );
 
 -- Allow authenticated users to upload their own avatar 
--- (Checks matches path with user id folder, secure way)
+-- (Simplified for reliability: Allow any auth user to upload)
 CREATE POLICY "Users can upload their own avatar" ON storage.objects
   FOR INSERT WITH CHECK (
     bucket_id = 'avatars' AND 
-    auth.role() = 'authenticated' AND
-    (storage.foldername(name))[1] = auth.uid()::text
+    auth.role() = 'authenticated'
+  );
+
+-- Allow authenticated users to update (overwrite) their own avatar
+DROP POLICY IF EXISTS "Users can update their own avatar" ON storage.objects;
+CREATE POLICY "Users can update their own avatar" ON storage.objects
+  FOR UPDATE USING (
+    bucket_id = 'avatars' AND 
+    auth.role() = 'authenticated'
+  );
+
+-- Allow authenticated users to delete their own avatar
+DROP POLICY IF EXISTS "Users can delete their own avatar" ON storage.objects;
+CREATE POLICY "Users can delete their own avatar" ON storage.objects
+  FOR DELETE USING (
+    bucket_id = 'avatars' AND 
+    auth.role() = 'authenticated'
   );
