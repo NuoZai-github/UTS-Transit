@@ -3,9 +3,14 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:mapsui="clr-namespace:Mapsui.UI.Maui;assembly=Mapsui.UI.Maui"
              xmlns:vm="clr-namespace:UTSTransit.ViewModels"
+             xmlns:converters="clr-namespace:UTSTransit.Converters"
              x:Class="UTSTransit.Views.MapPage"
              x:DataType="vm:MapViewModel"
              Title="Live Map">
+
+    <ContentPage.Resources>
+        <converters:ProgressToBoundsConverter x:Key="ProgressToBoundsConverter"/>
+    </ContentPage.Resources>
 
     <Grid>
         <!-- Full Screen Map -->
@@ -13,62 +18,58 @@
                         VerticalOptions="FillAndExpand" 
                         HorizontalOptions="FillAndExpand" />
 
-        <!-- Floating Bottom Sheet (Card) -->
-        <Frame VerticalOptions="End" 
-               Margin="16,0,16,24" 
-               CornerRadius="20" 
-               HasShadow="True" 
-               Padding="0"
-               BackgroundColor="{StaticResource Surface}">
+        <!-- Status Bar Overlay -->
+        <Border VerticalOptions="End" 
+                Margin="16,16,16,30" 
+                StrokeShape="RoundRectangle 20" 
+                BackgroundColor="{AppThemeBinding Light=White, Dark={StaticResource SurfaceDark}}"
+                Padding="16"
+                Stroke="{StaticResource Border}"
+                StrokeThickness="1"
+                Shadow="{Shadow Brush=Black, Offset='0,4', Radius=10, Opacity=0.2}"
+                IsVisible="{Binding IsBusActive}">
             
-            <Grid RowDefinitions="Auto, Auto" Padding="20">
-                <!-- Drag Handle -->
-                <BoxView HeightRequest="4" 
-                         WidthRequest="40" 
-                         Color="{StaticResource Border}" 
-                         CornerRadius="2" 
-                         HorizontalOptions="Center" 
-                         Margin="0,0,0,16"/>
+            <Grid RowDefinitions="Auto, Auto" RowSpacing="10">
+                <Label Text="Live Journey Status" 
+                       FontAttributes="Bold" 
+                       FontSize="16"
+                       HorizontalOptions="Center"
+                       TextColor="{StaticResource Primary}"/>
 
-                <!-- Content -->
-                <VerticalStackLayout Grid.Row="1" Spacing="16">
-                    <Label Text="Next Bus to Campus" 
-                           Style="{StaticResource CardSubtitleLabel}"/>
-                    
-                    <Grid ColumnDefinitions="*, Auto">
-                        <VerticalStackLayout>
-                            <Label Text="Route A" 
-                                   FontSize="20" 
-                                   FontAttributes="Bold" 
-                                   TextColor="{StaticResource Primary}"/>
-                            <Label Text="Arriving in 5 mins" 
-                                   TextColor="{StaticResource Success}" 
-                                   FontAttributes="Bold"/>
-                        </VerticalStackLayout>
+                <Grid Grid.Row="1" ColumnDefinitions="Auto, *, Auto" VerticalOptions="Center">
+                    <!-- Hostel (Left) -->
+                    <VerticalStackLayout Spacing="4" HorizontalOptions="Center">
+                        <Image Source="hostel_icon.png" HeightRequest="32" WidthRequest="32"/>
+                        <Label Text="Hostel" FontSize="11" TextColor="{StaticResource TextSecondary}" HorizontalOptions="Center"/>
+                    </VerticalStackLayout>
+
+                    <!-- Progress Track -->
+                    <Grid Grid.Column="1" VerticalOptions="Center" Margin="12,0" HeightRequest="40">
+                        <!-- Track Line -->
+                        <BoxView HeightRequest="6" 
+                                 Color="{StaticResource Border}" 
+                                 VerticalOptions="Center" 
+                                 CornerRadius="3"
+                                 Opacity="0.5"/>
                         
-                        <Button Grid.Column="1" 
-                                Text="Details" 
-                                Style="{StaticResource GhostButton}" 
-                                Padding="0"
-                                HorizontalOptions="End"/>
+                        <!-- Moving Bus Icon -->
+                        <AbsoluteLayout>
+                            <Image Source="bus_side.png" 
+                                   HeightRequest="36" 
+                                   WidthRequest="36"
+                                   Rotation="{Binding BusRotation}"
+                                   AbsoluteLayout.LayoutBounds="{Binding BusProgress, Converter={StaticResource ProgressToBoundsConverter}}"
+                                   AbsoluteLayout.LayoutFlags="PositionProportional"/>
+                        </AbsoluteLayout>
                     </Grid>
 
-                    <Button Text="Find Route" 
-                            Style="{StaticResource AccentButton}"/>
-                </VerticalStackLayout>
+                    <!-- Campus (Right) -->
+                    <VerticalStackLayout Grid.Column="2" Spacing="4" HorizontalOptions="Center">
+                        <Image Source="campus_icon.png" HeightRequest="32" WidthRequest="32"/>
+                        <Label Text="Campus" FontSize="11" TextColor="{StaticResource TextSecondary}" HorizontalOptions="Center"/>
+                    </VerticalStackLayout>
+                </Grid>
             </Grid>
-        </Frame>
-
-        <!-- Search Bar (Floating Top) -->
-        <Frame VerticalOptions="Start" 
-               Margin="16,16,16,0" 
-               CornerRadius="24" 
-               Padding="0" 
-               HasShadow="True"
-               HeightRequest="50">
-            <SearchBar Placeholder="Search destination..." 
-                       BackgroundColor="Transparent" 
-                       TextColor="{StaticResource TextPrimary}"/>
-        </Frame>
-    </Grid>
+        </Border>
+	</Grid>
 </ContentPage>

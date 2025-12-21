@@ -159,6 +159,9 @@
                    HeightRequest="52"
                    BorderColor="{StaticResource Primary}"
                    BackgroundColor="{StaticResource Surface}">
+                 <Frame.GestureRecognizers>
+                     <TapGestureRecognizer Command="{Binding GoToScheduleCommand}" />
+                 </Frame.GestureRecognizers>
                  <HorizontalStackLayout HorizontalOptions="Center" VerticalOptions="Center" Spacing="15">
                      <Image Source="schedule_icon.png" 
                             HeightRequest="32" 

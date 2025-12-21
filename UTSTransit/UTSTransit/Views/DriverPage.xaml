@@ -2,9 +2,15 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:vm="clr-namespace:UTSTransit.ViewModels"
+             xmlns:models="clr-namespace:UTSTransit.Models"
+             xmlns:converters="clr-namespace:UTSTransit.Converters"
              x:Class="UTSTransit.Views.DriverPage"
              x:DataType="vm:DriverViewModel"
              Title="Driver Console">
+
+    <ContentPage.Resources>
+        <converters:IsNotNullConverter x:Key="IsNotNullConverter"/>
+    </ContentPage.Resources>
 
     <Grid RowDefinitions="Auto, *">
         <!-- Header -->
@@ -54,9 +60,17 @@
                          <Label Text="Passenger List" Style="{StaticResource CardTitleLabel}"/>
                          <CollectionView ItemsSource="{Binding PassengerList}" HeightRequest="150" EmptyView="No bookings yet">
                             <CollectionView.ItemTemplate>
-                                <DataTemplate>
+                                <DataTemplate x:DataType="models:PassengerInfo">
                                     <Border StrokeShape="RoundRectangle 8" BackgroundColor="{StaticResource PageBackground}" Padding="10" Margin="0,4" StrokeThickness="0">
-                                        <Label Text="{Binding .}" TextColor="{StaticResource TextPrimary}" />
+                                        <Grid ColumnDefinitions="Auto, *">
+                                            <Frame CornerRadius="20" HeightRequest="40" WidthRequest="40" Padding="0" IsClippedToBounds="True" Margin="0,0,12,0" BorderColor="Transparent">
+                                                <Image Source="{Binding AvatarUrl}" Aspect="AspectFill" />
+                                            </Frame>
+                                            <VerticalStackLayout Grid.Column="1" VerticalOptions="Center">
+                                                <Label Text="{Binding FullName}" TextColor="{StaticResource TextPrimary}" FontAttributes="Bold"/>
+                                                <Label Text="{Binding StudentId}" TextColor="{StaticResource TextSecondary}" FontSize="12"/>
+                                            </VerticalStackLayout>
+                                        </Grid>
                                     </Border>
                                 </DataTemplate>
                             </CollectionView.ItemTemplate>
@@ -75,9 +89,13 @@
                                    HorizontalOptions="Center" />
 
                 <!-- Big Action Button -->
-                <Button Text="Start / Stop Trip"
+                <!-- Big Action Button -->
+                <Button Text="{Binding ButtonText}"
                         Command="{Binding ToggleSharingCommand}"
-                        Style="{StaticResource AccentButton}"
+                        BackgroundColor="{Binding ButtonColor}"
+                        TextColor="White"
+                        FontAttributes="Bold"
+                        CornerRadius="10"
                         HeightRequest="60"
                         FontSize="18"
                         Margin="0,16,0,0"/>

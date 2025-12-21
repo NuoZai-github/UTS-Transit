@@ -128,7 +128,7 @@ namespace UTSTransit.Services
                     }
                     
                     // Failed to auto-login (maybe confirmation really is required?)
-                    return (true, "Account created, but auto-login failed. Please verify email or login manually.");
+                    return (true, "Account created! Please check your email for verification link or login manually.");
                 }
 
                 if (session.User != null && !string.IsNullOrEmpty(session.AccessToken))
@@ -242,10 +242,24 @@ namespace UTSTransit.Services
             catch (Exception ex)
             {
                 Debug.WriteLine($"[Driver] Error: {ex.Message}");
+                throw; // Rethrow to let ViewModel handle it
             }
         }
 
-        // 司机：停止行程
+        public async Task<List<BusLocation>> GetCurrentBusLocationsAsync()
+        {
+            try
+            {
+                var response = await _client.From<BusLocation>().Get();
+                return response.Models;
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"GetBusLocations Failed: {ex.Message}");
+                return new List<BusLocation>();
+            }
+        }
+
         public async Task StopSharing()
         {
             var userId = GetCurrentUserId();
@@ -337,30 +351,66 @@ namespace UTSTransit.Services
 
         // --- Booking Features ---
 
-        public async Task<(bool IsSuccess, string Message)> BookSlotAsync(Guid scheduleId)
+        public async Task<(bool IsSuccess, string Message)> BookSlotAsync(Guid scheduleId, DateTime bookingDate)
         {
             try
             {
                 var userId = GetCurrentUserId();
-                if (string.IsNullOrEmpty(userId)) return (false, "Not logged in");
+                Debug.WriteLine($"[BOOK] ===== BOOKING ATTEMPT =====");
+                Debug.WriteLine($"[BOOK] UserId: {userId}");
+                Debug.WriteLine($"[BOOK] ScheduleId: {scheduleId}");
+                Debug.WriteLine($"[BOOK] BookingDate input: {bookingDate:yyyy-MM-dd HH:mm:ss}");
+                
+                if (string.IsNullOrEmpty(userId))
+                {
+                    Debug.WriteLine("[BOOK] FAILED: Not logged in");
+                    return (false, "Not logged in");
+                }
+
+                // IMPORTANT: Specify the date as UTC to prevent automatic timezone conversion
+                // This ensures 2025-12-22 stays as 2025-12-22 and doesn't become 2025-12-21
+                var dateAsUtc = DateTime.SpecifyKind(bookingDate.Date, DateTimeKind.Utc);
+                Debug.WriteLine($"[BOOK] BookingDate as UTC: {dateAsUtc:yyyy-MM-dd HH:mm:ss} Kind={dateAsUtc.Kind}");
 
                 var booking = new Models.Booking
                 {
                     ScheduleId = scheduleId,
                     StudentId = Guid.Parse(userId),
-                    BookingDate = DateTime.Today,
+                    BookingDate = dateAsUtc,
                     Status = "Booked"
                 };
 
-                await _client.From<Models.Booking>().Insert(booking);
+                Debug.WriteLine($"[BOOK] Inserting booking...");
+                var response = await _client.From<Models.Booking>().Insert(booking);
+                Debug.WriteLine($"[BOOK] Insert response: {response?.Models?.Count ?? 0} models returned");
+                Debug.WriteLine("[BOOK] SUCCESS!");
                 return (true, "Booking successful!");
             }
             catch (Exception ex)
             {
+                Debug.WriteLine($"[BOOK] EXCEPTION: {ex.Message}");
+                Debug.WriteLine($"[BOOK] Stack: {ex.StackTrace}");
+                
                 if (ex.Message.Contains("duplicate"))
                     return (false, "You have already booked this trip.");
 
                 return (false, $"Booking failed: {ex.Message}");
+            }
+        }
+
+        public async Task<(bool IsSuccess, string Message)> CancelBookingAsync(Guid bookingId)
+        {
+            try
+            {
+                await _client.From<Models.Booking>()
+                    .Where(x => x.Id == bookingId)
+                    .Delete();
+
+                return (true, "Booking cancelled.");
+            }
+            catch (Exception ex)
+            {
+                return (false, $"Cancellation failed: {ex.Message}");
             }
         }
 
@@ -369,20 +419,33 @@ namespace UTSTransit.Services
             try
             {
                 var userId = GetCurrentUserId();
-                if (string.IsNullOrEmpty(userId)) return new List<Models.Booking>();
+                if (string.IsNullOrEmpty(userId)) 
+                {
+                    Debug.WriteLine("[TransitService] GetStudentBookingsAsync: No user ID");
+                    return new List<Models.Booking>();
+                }
 
+                // Use Filter instead of Where to avoid BaseModel issues
                 var response = await _client.From<Models.Booking>()
-                    .Where(x => x.StudentId == Guid.Parse(userId) && x.BookingDate == DateTime.Today)
+                    .Filter("student_id", Supabase.Postgrest.Constants.Operator.Equals, userId)
                     .Get();
+
+                Debug.WriteLine($"[TransitService] Total bookings fetched: {response.Models.Count}");
+                foreach (var b in response.Models)
+                {
+                    Debug.WriteLine($"[TransitService] Booking ID={b.Id}, ScheduleId={b.ScheduleId}, Date={b.BookingDate}");
+                }
+
                 return response.Models;
             }
-            catch
+            catch (Exception ex)
             {
+                Debug.WriteLine($"[TransitService] GetStudentBookingsAsync Error: {ex.Message}");
                 return new List<Models.Booking>();
             }
         }
 
-        public async Task<List<string>> GetBookedStudentsForScheduleAsync(Guid scheduleId)
+        public async Task<List<PassengerInfo>> GetBookedStudentsForScheduleAsync(Guid scheduleId)
         {
             try
             {
@@ -392,23 +455,27 @@ namespace UTSTransit.Services
                     .Get();
                 
                 var bookings = bookingsFn.Models;
-                if (!bookings.Any()) return new List<string>();
+                if (!bookings.Any()) return new List<PassengerInfo>();
 
                 // 2. Get student IDs
                 var studentIds = bookings.Select(b => b.StudentId.ToString()).ToList();
 
                 // 3. Fetch Profiles manually since Supabase-csharp join is tricky
-                // Note: Where(x => list.Contains(x.Id)) might not work directly in all client versions, but let's try 'In' filter
                 var profilesFn = await _client.From<Models.Profile>()
                     .Filter("id", Supabase.Postgrest.Constants.Operator.In, studentIds)
                     .Get();
 
-                return profilesFn.Models.Select(p => p.StudentId ?? p.Email).ToList();
+                return profilesFn.Models.Select(p => new PassengerInfo 
+                {
+                    StudentId = p.StudentId ?? "N/A",
+                    FullName = p.FullName ?? p.Email ?? "Unknown",
+                    AvatarUrl = !string.IsNullOrEmpty(p.AvatarUrl) ? p.AvatarUrl : "user_placeholder.png"
+                }).ToList();
             }
             catch (Exception ex)
             {
                 Debug.WriteLine($"Error fetching student names: {ex.Message}");
-                return new List<string>();
+                return new List<PassengerInfo>();
             }
         }
 
@@ -531,6 +598,64 @@ namespace UTSTransit.Services
                     return response.Models.FirstOrDefault();
                 }
                 catch { return null; }
+            }
+        }
+        public async Task<List<Models.PassengerInfo>> GetBookedStudentsForScheduleAsync(Guid scheduleId, DateTime targetDate)
+        {
+            try
+            {
+                // Ensure the date matches how we store it (UTC specified)
+                var dateAsUtc = DateTime.SpecifyKind(targetDate.Date, DateTimeKind.Utc);
+                
+                // 1. Get bookings for this schedule AND this date
+                var bookingsResponse = await _client.From<Models.Booking>()
+                    .Where(b => b.ScheduleId == scheduleId && b.BookingDate == dateAsUtc)
+                    .Get();
+                
+                var bookings = bookingsResponse.Models;
+                if (!bookings.Any()) return new List<Models.PassengerInfo>();
+
+                // 2. Extract Student IDs
+                var studentIds = bookings.Select(b => b.StudentId).ToList();
+                
+                var passengerList = new List<Models.PassengerInfo>();
+
+                // 3. Fetch profiles
+                foreach (var sId in studentIds)
+                {
+                    try
+                    {
+                        var profile = await _client.From<Models.Profile>()
+                            .Where(p => p.Id == sId)
+                            .Single();
+
+                        if (profile != null)
+                        {
+                            passengerList.Add(new Models.PassengerInfo
+                            {
+                                FullName = profile.FullName ?? "Unknown",
+                                StudentId = profile.StudentId ?? "-",
+                                AvatarUrl = profile.AvatarUrl ?? "user_placeholder.png"
+                            });
+                        }
+                    }
+                    catch
+                    {
+                         passengerList.Add(new Models.PassengerInfo
+                        {
+                            FullName = "Unknown Student",
+                            StudentId = "-",
+                            AvatarUrl = "user_placeholder.png"
+                        });
+                    }
+                }
+                
+                return passengerList;
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"[Driver] Error fetching passengers: {ex.Message}");
+                return new List<Models.PassengerInfo>();
             }
         }
     }

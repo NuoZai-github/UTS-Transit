@@ -14,7 +14,7 @@
                              WidthRequest="320">
 
             <!-- Logo Area -->
-            <Image Source="dotnet_bot.png" 
+            <Image Source="app_logo.png" 
                    HeightRequest="120" 
                    WidthRequest="120" 
                    HorizontalOptions="Center"

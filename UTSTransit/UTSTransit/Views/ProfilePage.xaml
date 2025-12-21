@@ -38,6 +38,11 @@
                 <VerticalStackLayout Spacing="5">
                     <Label Text="Email Address" Style="{StaticResource SubtitleLabel}" />
                     <Label Text="{Binding UserEmail}" FontSize="18" TextColor="{AppThemeBinding Light={StaticResource TextPrimary}, Dark={StaticResource TextPrimaryDark}}" />
+
+                    <BoxView HeightRequest="1" Color="{AppThemeBinding Light={StaticResource Border}, Dark={StaticResource BorderDark}}" Margin="0,10,0,10"/>
+
+                    <Label Text="Student ID" Style="{StaticResource SubtitleLabel}" />
+                    <Label Text="{Binding StudentId}" FontSize="18" TextColor="{AppThemeBinding Light={StaticResource TextPrimary}, Dark={StaticResource TextPrimaryDark}}" />
                 </VerticalStackLayout>
             </Border>
 

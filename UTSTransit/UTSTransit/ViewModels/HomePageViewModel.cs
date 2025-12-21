@@ -186,5 +186,12 @@ namespace UTSTransit.ViewModels
         {
             await Shell.Current.GoToAsync("MapPage");
         }
+
+        [RelayCommand]
+        private async Task GoToSchedule()
+        {
+            // Navigate to the Schedule Tab (Absolute Route)
+            await Shell.Current.GoToAsync("//ScheduleTab");
+        }
     }
 }

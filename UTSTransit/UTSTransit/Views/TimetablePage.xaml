@@ -8,38 +8,66 @@
              Title="Schedule">
 
     <Grid RowDefinitions="Auto, *">
-        <!-- Header with Date Selector (Mockup) -->
+        <!-- Header with Date Selector -->
         <VerticalStackLayout Padding="24,24,24,12" Spacing="16" BackgroundColor="{StaticResource Surface}">
             <Label Text="Bus Schedule" Style="{StaticResource HeaderLabel}"/>
             
-            <!-- Date Chips (Horizontal Scroll) -->
-            <ScrollView Orientation="Horizontal" HorizontalScrollBarVisibility="Never">
-                <HorizontalStackLayout Spacing="12">
-                    <Border StrokeShape="RoundRectangle 20" BackgroundColor="{StaticResource Primary}" Padding="16,8" StrokeThickness="0">
-                        <Label Text="Today" TextColor="White" FontAttributes="Bold"/>
-                    </Border>
-                    <Border StrokeShape="RoundRectangle 20" BackgroundColor="{StaticResource PageBackground}" Padding="16,8" StrokeThickness="0">
-                        <Label Text="Tomorrow" TextColor="{StaticResource TextSecondary}"/>
-                    </Border>
-                    <Border StrokeShape="RoundRectangle 20" BackgroundColor="{StaticResource PageBackground}" Padding="16,8" StrokeThickness="0">
-                        <Label Text="Weekend" TextColor="{StaticResource TextSecondary}"/>
-                    </Border>
-                </HorizontalStackLayout>
-            </ScrollView>
+            <!-- Date Chips -->
+            <HorizontalStackLayout Spacing="12">
+                <!-- Today Button -->
+                <Border StrokeShape="RoundRectangle 20" 
+                        BackgroundColor="{Binding TodayTabColor}" 
+                        Padding="16,8" 
+                        StrokeThickness="0">
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding SelectTodayCommand}"/>
+                    </Border.GestureRecognizers>
+                    <Label Text="Today" TextColor="{Binding TodayTextColor}" FontAttributes="Bold"/>
+                </Border>
+                
+                <!-- Tomorrow Button -->
+                <Border StrokeShape="RoundRectangle 20" 
+                        BackgroundColor="{Binding TomorrowTabColor}" 
+                        Padding="16,8" 
+                        StrokeThickness="0">
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding SelectTomorrowCommand}"/>
+                    </Border.GestureRecognizers>
+                    <Label Text="Tomorrow" TextColor="{Binding TomorrowTextColor}" FontAttributes="Bold"/>
+                </Border>
+            </HorizontalStackLayout>
         </VerticalStackLayout>
 
         <!-- Schedule List -->
         <CollectionView Grid.Row="1" ItemsSource="{Binding Schedule}" Margin="16">
+            <!-- Empty State - No schedules available -->
+            <CollectionView.EmptyView>
+                <VerticalStackLayout VerticalOptions="Center" HorizontalOptions="Center" Padding="32" Spacing="16">
+                    <Label Text="🚌" FontSize="64" HorizontalOptions="Center"/>
+                    <Label Text="No slots available" 
+                           FontSize="20" 
+                           FontAttributes="Bold"
+                           TextColor="{StaticResource TextPrimary}"
+                           HorizontalOptions="Center"/>
+                    <Label Text="{Binding EmptyMessage}" 
+                           FontSize="14" 
+                           TextColor="{StaticResource TextSecondary}"
+                           HorizontalOptions="Center"
+                           HorizontalTextAlignment="Center"/>
+                </VerticalStackLayout>
+            </CollectionView.EmptyView>
+            
             <CollectionView.ItemTemplate>
                 <DataTemplate x:DataType="models:TimetableItem">
-                    <Frame Margin="0,6" Padding="0" CornerRadius="16">
+                    <Frame Margin="0,6" Padding="0" CornerRadius="16" Opacity="{Binding ItemOpacity}">
                         <Grid ColumnDefinitions="80, *, Auto" Padding="16">
                             <!-- Time Column -->
                             <VerticalStackLayout VerticalOptions="Center">
                                 <Label Text="{Binding DepartureTime}" 
                                        FontSize="18" 
                                        FontAttributes="Bold" 
-                                       TextColor="{StaticResource Primary}"/>
+                                       TextColor="{StaticResource Primary}"
+                                       TextDecorations="{Binding TimeTextDecoration}"/>
                                 <Label Text="Departs" 
                                        FontSize="12" 
                                        TextColor="{StaticResource TextSecondary}"/>
@@ -51,7 +79,8 @@
                                        FontAttributes="Bold" 
                                        FontSize="16" 
                                        TextColor="{StaticResource TextPrimary}"
-                                       LineBreakMode="TailTruncation"/>
+                                       LineBreakMode="TailTruncation"
+                                       TextDecorations="{Binding RouteTextDecoration}"/>
                                 <Label Text="To Campus" 
                                        FontSize="13" 
                                        TextColor="{StaticResource TextSecondary}"/>

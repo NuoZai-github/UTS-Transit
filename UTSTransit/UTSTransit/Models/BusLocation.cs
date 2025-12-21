@@ -3,17 +3,14 @@ using Supabase.Postgrest.Models;
 
 namespace UTSTransit.Models
 {
-    [Table("active_trips")]
+    [Table("bus_locations")]
     public class BusLocation : BaseModel
     {
-        [PrimaryKey("id")]
-        public int Id { get; set; }
-
-        [Column("driver_id")]
-        public string DriverId { get; set; } = string.Empty;
+        [PrimaryKey("driver_id", false)]
+        public string DriverId { get; set; }
 
         [Column("route_name")]
-        public string RouteName { get; set; } = string.Empty;
+        public string RouteName { get; set; }
 
         [Column("latitude")]
         public double Latitude { get; set; }
@@ -21,10 +18,10 @@ namespace UTSTransit.Models
         [Column("longitude")]
         public double Longitude { get; set; }
 
+        [Column("status")]
+        public string Status { get; set; }
+
         [Column("last_updated")]
         public DateTime LastUpdated { get; set; }
-
-        [Column("status")]
-        public string Status { get; set; } = "Stopped";
     }
 }

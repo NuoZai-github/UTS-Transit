@@ -10,20 +10,24 @@
             Routing.RegisterRoute("MapPage", typeof(Views.MapPage));
         }
 
-        public void SetDriverTabVisible(bool isVisible)
+        public void ConfigureTabs(string role)
         {
-            if (DriverTab != null)
-            {
-                DriverTab.IsVisible = isVisible;
-            }
-        }
-        
-        public void SetStudentTabsVisible(bool isVisible)
-        {
-            if (ScheduleTab != null) ScheduleTab.IsVisible = isVisible;
-            // Driver needs LiveMap but maybe not Announcements/Profile? 
-            // Requests: "Driver don't need to see this page" (Referring to image of Schedule page likely)
-            // Let's hide Schedule tab for Drivers.
+            // Default to Student view
+            bool isDriver = role == "driver";
+
+            // Safety check for nulls
+            if (DriverTab == null) return;
+
+            // Driver Tab: Only for drivers
+            DriverTab.IsVisible = isDriver;
+
+            // Student specific tabs: Hidden for Driver
+            if (HomeTab != null) HomeTab.IsVisible = !isDriver;
+            if (ScheduleTab != null) ScheduleTab.IsVisible = !isDriver;
+
+            // Common tabs: Visible for everyone
+            if (NewsTab != null) NewsTab.IsVisible = true;
+            if (ProfileTab != null) ProfileTab.IsVisible = true;
         }
     }
 }

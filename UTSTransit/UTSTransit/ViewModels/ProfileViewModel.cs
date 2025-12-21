@@ -13,6 +13,9 @@ namespace UTSTransit.ViewModels
 
         [ObservableProperty]
         private string _role;
+
+        [ObservableProperty]
+        private string _studentId;
         
         [ObservableProperty]
         private string _userEmail;
@@ -40,7 +43,8 @@ namespace UTSTransit.ViewModels
                     {
                         FullName = profile.FullName ?? "No Name";
                         Role = profile.Role ?? "Student";
-                        Console.WriteLine($"[ProfilePage] Loaded FullName: {FullName}, Role: {Role}");
+                        StudentId = profile.StudentId ?? "-";
+                        Console.WriteLine($"[ProfilePage] Loaded FullName: {FullName}, Role: {Role}, StudentId: {StudentId}");
                     }
 
                     // Force construct URL to bypass DB reading issues since filename is predictable
@@ -118,7 +122,7 @@ namespace UTSTransit.ViewModels
                 // Reset UI state
                 if (Shell.Current is AppShell appShell)
                 {
-                    appShell.SetDriverTabVisible(false);
+                    appShell.ConfigureTabs("student");
                 }
 
                 // Navigate back to Login Page

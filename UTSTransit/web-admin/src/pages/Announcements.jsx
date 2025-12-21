@@ -5,7 +5,7 @@ import { supabase } from '../supabaseClient'
 export default function Announcements() {
     const [items, setItems] = useState([])
     const [showModal, setShowModal] = useState(false)
-    const [formData, setFormData] = useState({ title: '', content: '', is_urgent: false })
+    const [formData, setFormData] = useState({ title: '', content: '' })
 
     useEffect(() => {
         fetchItems()
@@ -21,7 +21,7 @@ export default function Announcements() {
         const { error } = await supabase.from('announcements').insert([formData])
         if (!error) {
             setShowModal(false)
-            setFormData({ title: '', content: '', is_urgent: false })
+            setFormData({ title: '', content: '' })
             fetchItems()
         } else {
             alert(error.message)
@@ -43,7 +43,7 @@ export default function Announcements() {
 
             <div className="grid-3">
                 {items.map(item => (
-                    <div key={item.id} className="card" style={{ borderLeft: item.is_urgent ? '4px solid var(--danger)' : '4px solid var(--primary)' }}>
+                    <div key={item.id} className="card" style={{ borderLeft: '4px solid var(--primary)' }}>
                         <h3>{item.title}</h3>
                         <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>{new Date(item.created_at).toLocaleDateString()}</p>
                         <p>{item.content}</p>
@@ -70,15 +70,6 @@ export default function Announcements() {
                                 required
                                 rows="4"
                             />
-                            <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem' }}>
-                                <input
-                                    type="checkbox"
-                                    checked={formData.is_urgent}
-                                    onChange={e => setFormData({ ...formData, is_urgent: e.target.checked })}
-                                    style={{ width: 'auto', margin: 0 }}
-                                />
-                                Urgent?
-                            </label>
                             <div style={{ display: 'flex', gap: '1rem', justifyContent: 'flex-end' }}>
                                 <button type="button" className="btn" onClick={() => setShowModal(false)}>Cancel</button>
                                 <button type="submit" className="btn btn-primary">Post</button>

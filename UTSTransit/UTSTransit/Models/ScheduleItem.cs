@@ -20,5 +20,8 @@ namespace UTSTransit.Models
 
         [Column("status")]
         public string Status { get; set; } = "Scheduled";
+
+        [Column("special_date")]
+        public DateTime? SpecialDate { get; set; }
     }
 }

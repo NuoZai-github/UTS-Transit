@@ -54,9 +54,7 @@ namespace UTSTransit.ViewModels
                     var role = _transitService.GetCurrentUserRole();
                     if (Shell.Current is AppShell appShell)
                     {
-                        var isDriver = role == "driver";
-                        appShell.SetDriverTabVisible(isDriver);
-                        appShell.SetStudentTabsVisible(!isDriver); // Hide Schedule if Driver
+                        appShell.ConfigureTabs(role);
                     }
 
                     // Navigate to main page

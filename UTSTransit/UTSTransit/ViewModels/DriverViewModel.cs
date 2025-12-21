@@ -16,7 +16,7 @@ namespace UTSTransit.ViewModels
         private string _statusMessage = "Select a trip to view passengers";
 
         [ObservableProperty]
-        private string _selectedRoute = "Route A (Hostel -> Campus)";
+        private string _selectedRoute = "Please select your schedule first";
 
         [ObservableProperty]
         private string _selectedStatus = "Driving";
@@ -38,7 +38,7 @@ namespace UTSTransit.ViewModels
         private Models.ScheduleItem _selectedScheduleItem;
 
         public ObservableCollection<Models.ScheduleItem> Schedules { get; } = new();
-        public ObservableCollection<string> PassengerList { get; } = new();
+        public ObservableCollection<Models.PassengerInfo> PassengerList { get; } = new();
 
 #pragma warning restore MVVMTK0045
 
@@ -53,7 +53,34 @@ namespace UTSTransit.ViewModels
         {
             var items = await _transitService.GetSchedulesAsync();
             Schedules.Clear();
-            foreach (var item in items) Schedules.Add(item);
+            
+            var today = DateTime.Today; // Uses local system time, which is usually correct for the device context
+            var isWeekend = today.DayOfWeek == DayOfWeek.Saturday || today.DayOfWeek == DayOfWeek.Sunday;
+
+            foreach (var item in items)
+            {
+                bool shouldShow = false;
+
+                // 1. Special Slots: Only show if valid for TODAY
+                if (item.DayType == "Special")
+                {
+                    if (item.SpecialDate.HasValue && item.SpecialDate.Value.Date == today)
+                    {
+                        shouldShow = true;
+                    }
+                }
+                // 2. Daily Slots: Only show on Weekdays (Mon-Fri)
+                else if (!isWeekend)
+                {
+                    shouldShow = true;
+                }
+
+                if (shouldShow)
+                {
+                    // Optional: Sort by time? The API likely returns sorted by time, but we can rely on that.
+                    Schedules.Add(item);
+                }
+            }
         }
 
         async partial void OnSelectedScheduleItemChanged(Models.ScheduleItem value)
@@ -62,8 +89,8 @@ namespace UTSTransit.ViewModels
             IsBusy = true;
             SelectedRoute = value.RouteName; // Sync route name
 
-            // Fetch students
-            var students = await _transitService.GetBookedStudentsForScheduleAsync(value.Id);
+            // Fetch students for TODAY
+            var students = await _transitService.GetBookedStudentsForScheduleAsync(value.Id, DateTime.Today);
             PassengerList.Clear();
             if (students.Count == 0)
             {
@@ -89,6 +116,12 @@ namespace UTSTransit.ViewModels
             }
         }
 
+        [ObservableProperty]
+        private string _buttonText = "Start Journey";
+
+        [ObservableProperty]
+        private Color _buttonColor = Colors.Green; // Default Green
+
         [RelayCommand]
         public async Task ToggleSharing()
         {
@@ -101,12 +134,34 @@ namespace UTSTransit.ViewModels
 
             if (_isSharing)
             {
+                // STOPPING
                 StopLocationUpdates();
                 StatusMessage = "Trip Ended";
                 await _transitService.StopSharing();
+                
+                // Auto-update status and UI
+                SelectedStatus = "Service Stopped";
+                ButtonText = "Start Journey";
+                ButtonColor = Colors.Green; // Back to Start
+                _isSharing = false;
             }
             else
             {
+                // STARTING
+                // Check Permissions
+                var status = await Permissions.CheckStatusAsync<Permissions.LocationWhenInUse>();
+                if (status != PermissionStatus.Granted)
+                {
+                    status = await Permissions.RequestAsync<Permissions.LocationWhenInUse>();
+                }
+
+                if (status != PermissionStatus.Granted)
+                {
+                    StatusMessage = "Location permission denied.";
+                    IsBusy = false;
+                    return;
+                }
+
                 StatusMessage = "Starting GPS...";
                 IsBusy = true;
 
@@ -114,6 +169,11 @@ namespace UTSTransit.ViewModels
                 StartLocationUpdates();
 
                 _isSharing = true;
+                
+                // Auto-update status and UI
+                SelectedStatus = "Driving";
+                ButtonText = "End Journey";
+                ButtonColor = Colors.Red; // Red to Stop
                 StatusMessage = $"Broadcasting: {SelectedStatus}";
             }
         }
@@ -140,7 +200,8 @@ namespace UTSTransit.ViewModels
             try
             {
                 // Get GPS Location
-                var request = new GeolocationRequest(GeolocationAccuracy.Best, TimeSpan.FromSeconds(10));
+                // Use Medium accuracy for better indoor performance during testing
+                var request = new GeolocationRequest(GeolocationAccuracy.Medium, TimeSpan.FromSeconds(10));
                 var location = await Geolocation.Default.GetLocationAsync(request);
 
                 if (location != null)
@@ -154,7 +215,15 @@ namespace UTSTransit.ViewModels
             }
             catch (Exception ex)
             {
-                // StatusMessage = $"GPS Error: {ex.Message}";
+                System.Diagnostics.Debug.WriteLine($"[Driver] SendLocation Error: {ex.Message}");
+                if (_isSharing)
+                {
+                    // Update UI to show something is wrong, but don't spam if it's transient
+                    // StatusMessage = $"GPS Error: {ex.Message}"; 
+                    // Better: keep status but maybe append error? Or just log.
+                    // If it fails consistently, user needs to know.
+                    MainThread.BeginInvokeOnMainThread(() => StatusMessage = $"Error: {ex.Message}");
+                }
             }
         }
     }

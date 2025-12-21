@@ -2,6 +2,7 @@
 using System.Collections.ObjectModel;
 using UTSTransit.Models;
 using UTSTransit.Services;
+using Microsoft.Maui.Devices.Sensors;
 // using Microsoft.Maui.Controls.Maps; // Removed
 // using Microsoft.Maui.Maps; // Removed
 
@@ -32,7 +33,21 @@ namespace UTSTransit.ViewModels
             {
                 await _transitService.InitializeAsync();
 
-                // 订阅更新
+                // 1. Initial Fetch
+                var initialBuses = await _transitService.GetCurrentBusLocationsAsync();
+                MainThread.BeginInvokeOnMainThread(() =>
+                {
+                    if (initialBuses.Count > 0)
+                    {
+                        foreach (var bus in initialBuses) UpdateMapPin(bus);
+                    }
+                    else
+                    {
+                        IsBusActive = false;
+                    }
+                });
+
+                // 2. Realtime Subscription
                 await _transitService.SubscribeToBusUpdates((bus) =>
                 {
                     MainThread.BeginInvokeOnMainThread(() =>
@@ -40,12 +55,47 @@ namespace UTSTransit.ViewModels
                         UpdateMapPin(bus);
                     });
                 });
+
+                // 3. Polling Fallback (Every 5 seconds)
+                if (Application.Current != null)
+                {
+                    var timer = Application.Current.Dispatcher.CreateTimer();
+                    timer.Interval = TimeSpan.FromSeconds(5);
+                    timer.Tick += async (s, e) =>
+                    {
+                        var buses = await _transitService.GetCurrentBusLocationsAsync();
+                        if (buses.Count == 0)
+                        {
+                            BusPins.Clear();
+                            IsBusActive = false;
+                        }
+                        else
+                        {
+                            // Update existing
+                            foreach (var bus in buses) UpdateMapPin(bus);
+                            
+                            // Remove stalled/deleted pins (simple logic: clear if not in current list?)
+                            // For now, just keeping it simple. 
+                            // Polling ensures that at least we get updates if Realtime fails.
+                        }
+                    };
+                    timer.Start();
+                }
             }
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine($"Error initializing realtime: {ex.Message}");
             }
         }
+
+        [ObservableProperty]
+        private double _busProgress; // 0.0 (Hostel) to 1.0 (Campus)
+
+        [ObservableProperty]
+        private double _busRotation; // 0 = Face Right, 180 = Face Left
+
+        [ObservableProperty]
+        private bool _isBusActive;
 
         private void UpdateMapPin(BusLocation bus)
         {
@@ -57,9 +107,6 @@ namespace UTSTransit.ViewModels
                 existingPin.Longitude = bus.Longitude;
                 existingPin.Address = $"Updated: {bus.LastUpdated.ToLocalTime():T}";
                 
-                // Trigger update manually if needed, or replace item to trigger CollectionChanged
-                // For simplicity, let's replace it or rely on property change if BusPinModel implemented INotifyPropertyChanged
-                // Since it doesn't, let's remove and add (simplest for now to trigger Map update)
                 var index = BusPins.IndexOf(existingPin);
                 BusPins[index] = existingPin; 
             }
@@ -73,6 +120,38 @@ namespace UTSTransit.ViewModels
                     Longitude = bus.Longitude
                 };
                 BusPins.Add(newPin);
+            }
+
+            // --- Update Status Bar Logic ---
+            IsBusActive = true;
+
+            // Fixed Locations
+            var hostel = new Microsoft.Maui.Devices.Sensors.Location(2.3420, 111.8318);
+            var campus = new Microsoft.Maui.Devices.Sensors.Location(2.3417, 111.8442);
+            var busLoc = new Microsoft.Maui.Devices.Sensors.Location(bus.Latitude, bus.Longitude);
+
+            double totalDist = Microsoft.Maui.Devices.Sensors.Location.CalculateDistance(hostel, campus, Microsoft.Maui.Devices.Sensors.DistanceUnits.Kilometers);
+            double distFromHostel = Microsoft.Maui.Devices.Sensors.Location.CalculateDistance(hostel, busLoc, Microsoft.Maui.Devices.Sensors.DistanceUnits.Kilometers);
+            
+            // Calculate Progress (0 = Hostel, 1 = Campus)
+            // Note: TotalDist is straight line, but simple ratio works for status bar approximation
+            // Ideally project point onto line, but distance ratio is sufficient for UI
+            double rawProgress = 0;
+            if (totalDist > 0)
+                rawProgress = distFromHostel / totalDist;
+            
+            BusProgress = Math.Clamp(rawProgress, 0, 1);
+
+            // Determine Rotation based on Route Name
+            // Route A: Dorm -> Campus (Left to Right) -> Face Right (0)
+            // Route B: Campus -> Hostel (Right to Left) -> Face Left (180)
+            if (bus.RouteName != null && (bus.RouteName.Contains("Route B") || bus.RouteName.Contains("Hostel")))
+            {
+                 BusRotation = 180; 
+            }
+            else
+            {
+                 BusRotation = 0;
             }
         }
     }

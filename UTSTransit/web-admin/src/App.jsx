@@ -8,6 +8,8 @@ import Users from './pages/Users'
 import MapPage from './pages/MapPage'
 import Announcements from './pages/Announcements'
 import Schedule from './pages/Schedule'
+import Buses from './pages/Buses'
+import Tracking from './pages/Tracking'
 
 function App() {
   const [session, setSession] = useState(null)
@@ -66,6 +68,12 @@ function App() {
             <NavLink to="/schedule" className={({ isActive }) => isActive ? "nav-link active" : "nav-link"}>
               📅 Schedule
             </NavLink>
+            <NavLink to="/tracking" className={({ isActive }) => isActive ? "nav-link active" : "nav-link"}>
+              📍 Tracking
+            </NavLink>
+            <NavLink to="/buses" className={({ isActive }) => isActive ? "nav-link active" : "nav-link"}>
+              🚌 Buses
+            </NavLink>
           </nav>
           <div style={{ marginTop: 'auto' }}>
             <button onClick={handleLogout} className="nav-link" style={{ background: 'none', border: 'none', width: '100%', cursor: 'pointer', textAlign: 'left' }}>
@@ -80,6 +88,8 @@ function App() {
             <Route path="/map" element={<MapPage />} />
             <Route path="/announcements" element={<Announcements />} />
             <Route path="/schedule" element={<Schedule />} />
+            <Route path="/tracking" element={<Tracking />} />
+            <Route path="/buses" element={<Buses />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </main>

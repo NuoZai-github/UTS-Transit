@@ -11,20 +11,20 @@
 
     <!-- Bottom Tab Bar -->
     <TabBar Route="MainTabs">
-        <Tab Title="I am Driver" Icon="dotnet_bot.png" x:Name="DriverTab" IsVisible="False">
+        <Tab Title="I am Driver" Icon="app_logo.png" x:Name="DriverTab" IsVisible="False">
             <ShellContent ContentTemplate="{DataTemplate views:DriverPage}" Route="DriverPage" />
         </Tab>
-        <Tab Title="Home" Icon="nav_home.png">
+        <Tab Title="Home" Icon="nav_home.png" x:Name="HomeTab">
             <ShellContent ContentTemplate="{DataTemplate views:HomePage}" />
         </Tab>
-        <Tab Title="Schedule" Icon="nav_schedule.png" x:Name="ScheduleTab">
+        <Tab Title="Schedule" Icon="nav_schedule.png" x:Name="ScheduleTab" Route="ScheduleTab">
             <ShellContent ContentTemplate="{DataTemplate views:TimetablePage}" />
         </Tab>
 
-        <Tab Title="News" Icon="nav_news.png">
+        <Tab Title="News" Icon="nav_news.png" x:Name="NewsTab">
             <ShellContent ContentTemplate="{DataTemplate views:AnnouncementsPage}" />
         </Tab>
-        <Tab Title="Profile" Icon="nav_profile.png">
+        <Tab Title="Profile" Icon="nav_profile.png" x:Name="ProfileTab">
             <ShellContent ContentTemplate="{DataTemplate views:ProfilePage}" />
         </Tab>
     </TabBar>
