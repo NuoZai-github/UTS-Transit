@@ -1,0 +1,81 @@
+UTS Transit - User Manual
+
+Version: 1.1
+Date: December 2025
+Team: UTS Transit Development Team
+
+1. INTRODUCTION
+
+UTS Transit is a smart campus mobility solution designated to make transportation at University of Technology Sarawak (UTS) more predictable and efficient. This manual provides instructions for Students, Drivers, and Administrators.
+
+2. GETTING STARTED
+
+System Requirements:
+- Mobile App: Android 8.0 or newer / iOS 14 or newer.
+- Web Admin Portal: Chrome, Edge, Safari, or Firefox browsers.
+- Internet: Active internet connection required.
+
+Installation:
+- Android: Install the provided UTSTransit.apk file. (Note: Allow "Install from Unknown Sources" if prompted).
+- Web Portal: Access via the provided URL.
+
+3. REGISTRATION GUIDE (IMPORTANT)
+
+Student Registration:
+1. Open the App and tap "Sign up here".
+2. Enter your Email, Password (min 6 characters), Full Name, and Student ID.
+3. Keep the Role selected as "Student".
+4. Tap Register.
+
+Driver & Admin Registration (Restricted):
+To ensure security, Driver and Admin accounts are restricted.
+1. On the Sign Up page, enter your personal details.
+2. Select Role as "Driver" or "Admin".
+3. You will be required to enter a System Code.
+4. Enter the Code: LIME6199
+5. Tap Register. (Note: Incorrect codes will prevent registration).
+
+4. STUDENT FEATURES
+
+Booking Trips:
+1. On the Home Screen, view the list of available bus schedules.
+2. Tap the "Book Trip" button next to your desired time.
+3. The button will change to "Booked", confirming your reservation.
+
+Live Bus Tracking:
+1. Navigate to the "Map" tab at the bottom.
+2. When prompted, select "Allow" or "While using the app" for Location Permissions.
+3. You will see a map with your location (Blue Dot) and the Bus (Bus Icon).
+4. Observe the Status Bar at the bottom of the screen to see the bus's progress between Hostel and Campus.
+
+5. DRIVER FEATURES
+
+Starting a Journey:
+1. Log in with your Driver credentials.
+2. On the Console page, select the current trip from the dropdown menu.
+3. Check the passenger count.
+4. Tap the green "Start Journey" button.
+5. Important: Ensure you grant Location Permissions when asked.
+6. Your status will update to "Driving" and your location will be broadcast to students.
+
+Ending a Journey:
+1. Once you arrive at the destination, tap the red "End Journey" button.
+2. Tracking will stop automatically.
+
+6. ADMIN WEB PORTAL
+
+1. Access the Web Admin URL and log in.
+2. Dashboard: View overview statistics including total students, drivers, and active buses.
+3. Tracking: Click the "Tracking" tab to view a live map of all active buses.
+4. Announcements: Use this tab to post system-wide notifications.
+
+7. TROUBLESHOOTING
+
+Issue: Registration Failed
+Solution: Ensure your password is at least 6 characters. If registering as Driver, ensure you used the code LIME6199.
+
+Issue: Location Permission Denied
+Solution: Go to Phone Settings > Apps > UTSTransit > Permissions > Location, and select "Allow".
+
+Issue: Bus Icon Not Moving
+Solution: The driver may not have started the journey yet, or their internet connection is unstable.
